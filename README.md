@@ -17,7 +17,7 @@ A plataforma permitirá organizar informações de colaboradores, controlar freq
 - Dashboard com indicadores de RH
 - Gerenciamento de empresas e usuários
 
-## 🛠️ Tecnologias utilizadas
+## Tecnologias utilizadas
 
 - **HTML5** — Estrutura das páginas
 - **CSS3** — Estilização e responsividade
