@@ -1,0 +1,3 @@
+BD RH Management
+
+CREATE DATABASE rhmanagement;
