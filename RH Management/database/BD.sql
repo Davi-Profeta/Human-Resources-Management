@@ -17,7 +17,7 @@ CREATE TABLE tipo_vinculo (
 	nome_vinculo VARCHAR(100)
 );
 
-CREATE TABLE status (
+CREATE TABLE statuss (
 	id_status INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	status_agora VARCHAR(100)
 );
