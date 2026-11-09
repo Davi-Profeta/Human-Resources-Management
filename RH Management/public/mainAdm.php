@@ -2,9 +2,10 @@
     require_once "../src/config/conexao.php";
     session_start();
 
-    if(!$_SESSION['User'] && $_SESSION['Nivel'] == 1){
+    if (empty($_SESSION['User']) || $_SESSION['Nivel'] != 1) {
         header("Location: index.php");
-    };
+        exit;
+    }
 
 ?>
 
