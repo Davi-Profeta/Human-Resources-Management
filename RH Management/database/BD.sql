@@ -94,3 +94,57 @@ CREATE TABLE desligamento (
 		FOREIGN KEY (id_acessos) REFERENCES acessos(id_acesso) 
 );
 
+
+-- =====================================================================
+-- MÓDULO DE BENEFÍCIOS
+-- Rode este arquivo DEPOIS do BD.sql (ele ajusta e complementa o banco).
+-- =====================================================================
+USE rhmanagement;
+
+INSERT INTO statuss (status_agora)
+SELECT 'Ativo' FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM statuss WHERE status_agora = 'Ativo');
+
+INSERT INTO statuss (status_agora)
+SELECT 'Inativo' FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM statuss WHERE status_agora = 'Inativo');
+
+
+ALTER TABLE beneficios
+    ADD COLUMN tipo VARCHAR(50)   NOT NULL DEFAULT 'Outro' AFTER descricao,
+    ADD COLUMN valor DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER tipo,
+    ADD COLUMN desconto DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER valor,
+    ADD COLUMN id_empresa INT NULL AFTER id_status,
+    ADD CONSTRAINT fk_beneficios_empresa
+        FOREIGN KEY (id_empresa) REFERENCES empresas(id_empresas);
+
+CREATE TABLE colaborador_beneficio (
+    id_vinculo_beneficio INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    id_colaboradores     INT NOT NULL,
+    id_beneficios        INT NOT NULL,
+    id_status            INT,
+    data_inicio          DATE NOT NULL,
+    data_fim             DATE NULL,
+    FOREIGN KEY (id_colaboradores) REFERENCES colaboradores(id_colaboradores) ON DELETE CASCADE,
+    FOREIGN KEY (id_beneficios)    REFERENCES beneficios(id_beneficios)       ON DELETE CASCADE,
+    FOREIGN KEY (id_status)        REFERENCES statuss(id_status),
+    -- impede vincular o mesmo benefício duas vezes ao mesmo colaborador
+    UNIQUE KEY uq_colab_benef (id_colaboradores, id_beneficios)
+);
+
+-- Exemplos para testar a tela
+-- ---------------------------------------------------------------------
+INSERT INTO beneficios (id_status, nome_beneficios, descricao, tipo, valor, desconto)
+SELECT s.id_status, b.nome, b.descricao, b.tipo, b.valor, b.desconto
+FROM statuss s
+JOIN (
+    SELECT 'Vale-refeição'    AS nome, 'Cartão para refeições em restaurantes'       AS descricao, 'Alimentação' AS tipo, 600.00 AS valor,  0.00 AS desconto UNION ALL
+    SELECT 'Vale-transporte',          'Auxílio para o deslocamento casa-trabalho',        'Transporte',   220.00,  0.00 UNION ALL
+    SELECT 'Plano de saúde',           'Plano médico e hospitalar nacional',               'Saúde',        450.00, 90.00 UNION ALL
+    SELECT 'Plano odontológico',       'Cobertura odontológica completa',                  'Odontológico',  45.00,  0.00 UNION ALL
+    SELECT 'Seguro de vida',           'Seguro de vida em grupo',                          'Seguro',        30.00,  0.00 UNION ALL
+    SELECT 'Gympass',                  'Acesso a academias e atividades físicas',          'Bem-estar',     90.00, 30.00
+) b
+WHERE s.status_agora = 'Ativo'
+  AND NOT EXISTS (SELECT 1 FROM beneficios WHERE nome_beneficios = b.nome);
+
