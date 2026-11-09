@@ -62,18 +62,32 @@ section a{
     height: 10dvh;               
 }
 
-.page{
+.page {
     display: flex;
     align-items: center;
-    height: 7dvh;                
-    min-height: 2.5rem;        
+    height: 7dvh;
+    min-height: 2.5rem;
     color: #fff;
     white-space: nowrap;
     margin-bottom: 0.5dvh;
+    border-radius: 8px;
+
+    transition: 
+        background-color 0.3s ease,
+        color 0.3s ease;
 }
-.page:hover{
-    background-color: var(--cor-alerta);
-    color: var(--cor-texto);
+
+.page:hover {
+    background-color: rgba(47, 91, 234, 0.25);
+    color: #fff;
+}
+
+.page .icone {
+    transition: transform 0.3s ease;
+}
+
+.page:hover .icone {
+    transform: translateX(4px);
 }
 
 .icone{
