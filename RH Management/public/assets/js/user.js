@@ -140,7 +140,10 @@ dialogUser.addEventListener("click", e => {
         dialogUser.close();
     }
     if (e.target.id === "logout") {
-        window.location.href = ""; // seu logout
+        window.top.location.href = new URL(
+            "logout.php",
+            window.top.location.href
+        ).href;
     }
 });
 
