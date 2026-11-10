@@ -117,3 +117,30 @@ pesquisa.addEventListener("input", _.throttle(async e => {
     }
 
 }, 300)); // espera 300ms depois que você para de digitar
+
+/* ============================ USER LOGADO ============================ */
+const profile = document.querySelector(".profile");
+const dialogUser = document.querySelector("dialog.user");
+
+profile.addEventListener("click", async e => {
+
+    try {
+        const res = await axios.get("../../src/APIs/loginUser.php");
+        dialogUser.innerHTML = res.data;
+        dialogUser.showModal();
+
+    } catch (error) {
+        console.log("Erro ao buscar login");
+    };
+
+});
+
+dialogUser.addEventListener("click", e => {
+    if (e.target === dialogUser || e.target.id === "closeUser") {
+        dialogUser.close();
+    }
+    if (e.target.id === "logout") {
+        window.location.href = ""; // seu logout
+    }
+});
+
