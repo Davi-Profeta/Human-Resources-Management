@@ -34,6 +34,7 @@
 
                     $_SESSION['User'] = $User;
                     $_SESSION['Nivel'] = $Nivel;
+                    $_SESSION['Email'] = $usuario['email'];
                     header("Location: mainAdm.php");
                     exit();
 
