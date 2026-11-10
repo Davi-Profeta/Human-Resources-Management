@@ -293,18 +293,18 @@ INSERT INTO rhmanagement.acessos (
 ) VALUES 
 (
     'ADM', 
-    '111.111.111-11', 
+    '11111111111', 
     'adm@empresa.com', 
-    '(31) 99999-0001', 
+    '31999990001', 
     'Rua Exemplo, 100 - Centro', 
     'senha123', 
     1
 ),
 (
     'GestorRH', 
-    '222.222.222-22', 
+    '22222222222', 
     'gestorrh@empresa.com', 
-    '(31) 99999-0002', 
+    '31999990002', 
     'Rua Exemplo, 200 - Centro', 
     'senha123', 
     2
