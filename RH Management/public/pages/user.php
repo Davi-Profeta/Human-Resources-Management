@@ -3,9 +3,10 @@
     require_once "../../src/config/conexao.php";
     session_start();
 
-    if(!$_SESSION['User'] && $_SESSION['Nivel'] == 1){
+    if (empty($_SESSION['User']) || $_SESSION['Nivel'] != 1) {
         header("Location: index.php");
-    };
+        exit;
+    }
 
     $Erro = "";
 
@@ -43,8 +44,6 @@
             $stmtA->execute([$Id]);
 
         };
-
-        
 
     };
 
@@ -104,7 +103,7 @@
 
         <section>
 
-            <input placeholder="Pesquise por nome e CPF" type="text" name="" id="ipt">
+            <input placeholder="Pesquise por nome" type="text" name="" id="ipt">
 
         </section>
 
@@ -112,18 +111,20 @@
 
             <table>
 
-                <tr>
-                    <th>Nome</th>
-                    <th>CPF</th>
-                    <th>Email</th>
-                    <th>Telefone</th>
-                    <th>Endereço</th>
-                    <th>Ações</th>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                        <th>Endereço</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody id="corpoTabela">
 
                 <?php
-
-                    require_once "../../src/config/conexao.php";
 
                     $users = ("SELECT *
                     FROM acessos ");
@@ -133,11 +134,11 @@
                     $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                     foreach($usuarios as $resultado){
-                        $nome     = ($resultado['nome_user']);
-                        $cpf      = ($resultado['CPF']);
-                        $email    = ($resultado['email']);
-                        $telefone = ($resultado['telefone']);
-                        $endereco = ($resultado['endereco']);
+                        $nome     = htmlspecialchars($resultado['nome_user']);
+                        $cpf      = htmlspecialchars($resultado['CPF']);
+                        $email    = htmlspecialchars($resultado['email']);
+                        $telefone = htmlspecialchars($resultado['telefone']);
+                        $endereco = htmlspecialchars($resultado['endereco']);
 
                         echo "
                             <tr>
@@ -148,12 +149,12 @@
                                 <td>{$endereco}</td>
                                 <td>
                                     <div class=\"acoes\">
-                                        <button type=\"button\" class=\"btn-acao btn-editar\" title=\"Editar usuário\" aria-label=\"Editar usuário\">
+                                        <a class='btn-acao btn-editar' href='user.php?editar={$resultado['id_acesso']}' title='Editar usuário'>
                                             <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">
                                                 <path d=\"M12 20h9\" />
                                                 <path d=\"M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z\" />
                                             </svg>
-                                        </button>
+                                        </a>
                                         <button type='button' class='btn-acao btn-excluir'
                                                 data-id='{$resultado['id_acesso']}'
                                                 title='Apagar usuário' aria-label='Apagar usuário'>
@@ -172,6 +173,8 @@
                     }
 
                 ?>
+
+                </tbody>
 
             </table>
 
@@ -286,96 +289,13 @@
 
     </dialog>
 
-    <dialog class="edit">
+    <dialog class="user">
 
-        <div class="topModal">
-            <h3>Cadastrar Usuário</h3>
-        </div>
-        
-        <?php
-
-            $dados = ("SELECT *
-            FROM acessos ");
-
-            $stmtD = $pdo->prepare($dados);
-            $stmtD->execute([$Id]);
-
-            foreach($stmtD as $i){
-
-                 echo "
-                    <div class='mainModal'>
-                            <form action='user.php' method='post'>
-
-                                <div class='ipt'>
-                                    <div class='separation'>
-                                        <label>Nome Completo</label>
-                                        <input required type='text' name='name' value='{$i['nome_user']}'>
-                                    </div>
-                                    <div class='separation'>
-                                        <label>CPF</label>
-                                        <input required maxlength='11' type='text' inputmode='numeric' name='CPF' value='$cpf'>
-                                    </div>
-                                </div>
-
-                                <div class='ipt'>
-                                    <div class='separation'>
-                                        <label>Email</label>
-                                        <input required type='email' name='email' value='$email'>
-                                    </div>
-                                    <div class='separation'>
-                                        <label>Telefone</label>
-                                        <input required maxlength='13' type='tel' name='tel' value=''>
-                                    </div>
-                                </div>
-
-                                <div class='ipt'>
-                                    <div class='separation'>
-                                        <label>Endereço</label>
-                                        <input required type='text' name='local' value='$endereco'>
-                                    </div>
-                                    <div class='separation'>
-                                        <label>Nível de Usuário</label>
-                                        <select name='nivel'>
-                                            <option value='1' >Administrador</option>
-                                            <option value='2' >Gerente RH</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class='ipt'>
-                                    <div class='separation'>
-                                        <label>Nova Senha</label>
-                                        <input type='password' name='password1' placeholder='Deixe vazio para manter'>
-                                    </div>
-                                    <div class='separation'>
-                                        <label>Confirmar Senha</label>
-                                        <input type='password' name='password2'>
-                                    </div>
-                                </div>
-
-                                <div class='ipt'>
-                                    <p class='erro' id='erro'></p>
-                                    <div class='btns'>
-                                        <button type='submit'>Confirmar</button>
-                                        <button type='button' id='cancelEdit'>Cancelar</button>
-                                    </div>
-                                </div>
-
-                                <input type='hidden' name='id' value=''>
-                                <input type='hidden' name='acao' value='edit'>
-                        </form>
-                    </div>
-                    ";
-
-            };
-           
-        
-        ?>
 
     </dialog>
-
     
 </body>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="../assets/js/user.js"></script>
 </html>
-
