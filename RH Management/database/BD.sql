@@ -282,6 +282,34 @@ AND NOT EXISTS (
     WHERE nome_beneficios = b.nome
 );
 
+INSERT INTO rhmanagement.acessos (
+    nome_user, 
+    CPF, 
+    email, 
+    telefone, 
+    endereco, 
+    senha, 
+    nivel
+) VALUES 
+(
+    'ADM', 
+    '111.111.111-11', 
+    'adm@empresa.com', 
+    '(31) 99999-0001', 
+    'Rua Exemplo, 100 - Centro', 
+    'senha123', 
+    1
+),
+(
+    'GestorRH', 
+    '222.222.222-22', 
+    'gestorrh@empresa.com', 
+    '(31) 99999-0002', 
+    'Rua Exemplo, 200 - Centro', 
+    'senha123', 
+    2
+);
+
 -- ==========================================
 -- VERIFICAÇÃO FINAL
 -- ==========================================
