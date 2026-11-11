@@ -47,6 +47,8 @@ CREATE TABLE empresas (
     telefone VARCHAR(13) NOT NULL,
     endereco VARCHAR(100) NOT NULL,
     razao_social VARCHAR(200) NOT NULL
+    id_stats INT,
+    FOREIGN KEY (id_stats) REFERENCES statuss(id_status)
 );
 
 -- ==========================================
