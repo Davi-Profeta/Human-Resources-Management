@@ -3,11 +3,16 @@
     require_once "../../src/config/conexao.php";
     session_start();
 
+    if (empty($_SESSION['User']) || $_SESSION['Nivel'] != 1) {
+        header("Location: index.php");
+        exit;
+    }
+
     if($_SERVER ['REQUEST_METHOD'] === "POST"){
 
         $Acao = $_POST['acao'];
 
-        if($Acao === "new"){
+        if($Acao === 'new'){
 
             $nameEnterprice = $_POST['name'];
             $CNPJ = $_POST['cnpj'];
@@ -15,9 +20,21 @@
             $Tel = $_POST['tel'];
             $Endereco = $_POST['local'];
             $Razao = $_POST['RS'];
+            $Stats = $_POST['status'];
 
+            $Enterprice = $pdo->prepare("INSERT INTO empresas(nome_empresas, CNPJ, email, telefone, endereco, razao_social, id_stats)
+            VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $Enterprice->execute([$nameEnterprice, $CNPJ, $Email, $Tel, $Endereco, $Razao, $Stats]);
 
-        };
+        } else if($Acao === 'apagar'){
+
+            $Id = $_POST['id'];
+
+            $deleteEnterprice = $pdo->prepare("DELETE FROM empresas
+            WHERE id_empresas = ?");
+            $deleteEnterprice->execute([$Id]);
+
+         };
 
     };
 
@@ -80,8 +97,8 @@
 
             <select id="filtroStatus" aria-label="Filtrar por status">
                 <option value="">Todos os status</option>
-                <option value="ativo">Ativos</option>
-                <option value="inativo">Inativos</option>
+                <option value="Ativo">Ativos</option>
+                <option value="Inativo">Inativos</option>
             </select>
 
         </section>
@@ -104,33 +121,34 @@
                             <th>Status</th>
                             <th>Ações</th>
                         </tr>
-                    </thead>
+                    </thead> 
 
                     <tbody>
                     <?php
 
-                        $listaEmpresas = $pdo->prepare("SELECT *
-                        FROM empresas");
+                        $listaEmpresas = $pdo->prepare("SELECT id_empresas,nome_empresas, CNPJ, email, telefone, endereco, razao_social, status_agora
+                        FROM empresas
+                        INNER JOIN statuss ON id_status = id_stats");
                         $listaEmpresas->execute();
 
-                        $empresa = $listaEmpresas->fetch(PDO::FETCH_BOTH);
+                        $empresa = $listaEmpresas->fetchAll(PDO::FETCH_BOTH);
 
                         if($empresa){
 
                             foreach($empresa as $i){
 
                             echo "<tr>
-                                    <td>{$empresa['nome_empresa']}</td>
-                                    <td>{$empresa['cnpj']}</td>
-                                    <td>{$empresa['email']}</td>
-                                    <td>{$empresa['telefone']}</td>
-                                    <td>{$empresa['endereco']}</td>
-                                    <td>{$empresa['razao_social']}</td>
-                                    <td>{$empresa['colaboradores']}</td>
-                                    <td>{$empresa['status']}</td>
+                                    <td>{$i['nome_empresas']}</td>
+                                    <td>{$i['CNPJ']}</td>
+                                    <td>{$i['email']}</td>
+                                    <td>{$i['telefone']}</td>
+                                    <td>{$i['endereco']}</td>
+                                    <td>{$i['razao_social']}</td>
+                                    
+                                    <td class='statsNow'>{$i['status_agora']}</td>
                                     <td>
-                                        <a href='editar.php?id={$empresa['id']}' class='btn-editar'>Editar</a>
-                                        <a href='excluir.php?id={$empresa['id']}' class='btn-excluir'>Excluir</a>
+                                        <button class='btn-editar'> Editar </button>
+                                        <button data-id='{$i['id_empresas']}' class='btn-excluir'> Excluir</button>
                                     </td>
                                 </tr>";
 
@@ -162,7 +180,7 @@
         
         <div class="mainModal">
 
-            <form action="empresa.php" method="post">
+            <form action="empresas.php" method="post">
 
                 <div class="ipt">
 
@@ -173,7 +191,7 @@
 
                     <div class="separation">
                         <label for="">CNPJ</label>
-                        <input required maxlength="11" type="num" name="cnpj" id="">
+                        <input required maxlength="14" type="num" name="cnpj" id="">
                     </div>
                     
                 </div>
@@ -209,15 +227,10 @@
                 <div class="ipt">
 
                     <div class="separation">
-                        <label for="">Colaboradores</label>
-                        <input required type="num" name="password1" id="">
-                    </div>
-
-                    <div class="separation">
                         <label for="">Status</label>
-                        <select name="" id="">
-                            <option value="">Ativo</option>
-                            <option value="">Inativa</option>
+                        <select name="status" id="">
+                            <option value="1">Ativo</option>
+                            <option value="2">Inativa</option>
                         </select>
                     </div>
 
@@ -240,6 +253,24 @@
             </form>
 
         </div>
+
+    </dialog>
+
+
+  <dialog class="delete">
+
+        <form action="empresas.php" method="post">
+            <h3>Apagar Empresa</h3>
+            <p>Tem certeza que deseja apagar esta Empresa?</p>
+
+            <input type="hidden" name="acao" value="apagar">
+            <input type="hidden" name="id" id="idApagar"> <!-- receber o id de quem vai apagar -->
+
+            <div class="dialog-botoes">
+                <button type="button" id="cancelarExcluir">Cancelar</button>
+                <button type="submit" class="excluir">Apagar</button>
+            </div>
+        </form>
 
     </dialog>
     
