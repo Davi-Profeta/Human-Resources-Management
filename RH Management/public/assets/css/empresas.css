@@ -281,3 +281,206 @@ main {
 .btn-excluir:hover {
   background-color: rgba(220, 38, 38, 0.15);
 }
+
+/* ================================ DIALOG: NOVA EMPRESA ================================ */
+.newEnterprice {
+  margin: auto; /* o reset "*" zera o margin e descentraliza o dialog */
+  padding: 28px;
+  border: none;
+  border-radius: 16px;
+  background-color: var(--cor-superficie);
+  color: var(--cor-texto);
+  font-family: var(--fonte-base);
+  width: min(640px, 90dvw);
+  max-height: 92dvh;
+  overflow-y: auto;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.45);
+}
+
+.newEnterprice[open] {
+  animation: abrirModal 0.18s ease-out;
+}
+
+.newEnterprice::backdrop {
+  background-color: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(2px);
+}
+
+@keyframes abrirModal {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .newEnterprice[open] { animation: none; }
+}
+
+/* topo */
+.newEnterprice .topModal {
+  padding-bottom: 14px;
+  margin-bottom: 20px;
+  border-bottom: solid 1px var(--cor-borda);
+}
+
+.newEnterprice .topModal h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--cor-texto);
+}
+
+/* corpo */
+.newEnterprice .mainModal {
+  width: 100%;
+}
+
+.newEnterprice .ipt {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.newEnterprice .separation {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 50%;
+  min-width: 0;
+}
+
+.newEnterprice label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--cor-texto);
+}
+
+.newEnterprice input,
+.newEnterprice select {
+  width: 100%;
+  padding: 10px 12px;
+  border: solid 1.5px var(--cor-borda);
+  border-radius: 8px;
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+  font-family: var(--fonte-base);
+  font-size: 0.9rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.newEnterprice input:focus,
+.newEnterprice select:focus {
+  outline: none;
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 3px var(--cor-primaria-clara);
+  background-color: var(--cor-superficie);
+}
+
+/* borda vermelha só depois que o usuário mexeu no campo */
+.newEnterprice input:user-invalid {
+  border-color: var(--cor-erro);
+}
+
+/* select com seta própria */
+.newEnterprice select {
+  padding-right: 36px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+.newEnterprice select option {
+  background-color: var(--cor-superficie);
+  color: var(--cor-texto);
+}
+
+/* última linha: mensagem de erro + botões */
+.newEnterprice .ipt:last-of-type {
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  margin-bottom: 0;
+  padding-top: 18px;
+  border-top: solid 1px var(--cor-borda);
+}
+
+.newEnterprice .erro {
+  flex: 1;
+  color: var(--cor-erro);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.newEnterprice .btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.newEnterprice .btns button {
+  padding: 9px 20px;
+  border-radius: 10px;
+  font-family: var(--fonte-base);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.newEnterprice .btns button[type="submit"] {
+  border: none;
+  background-color: var(--cor-primaria);
+  color: var(--cor-fundo);
+}
+
+.newEnterprice .btns button[type="submit"]:hover {
+  background-color: var(--cor-primaria-escura);
+}
+
+.newEnterprice .btns button[type="button"] {
+  border: solid 1.5px var(--cor-borda);
+  background-color: transparent;
+  color: var(--cor-texto-suave);
+}
+
+.newEnterprice .btns button[type="button"]:hover {
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+}
+
+.newEnterprice .btns button:focus-visible {
+  outline: solid 2px var(--cor-destaque);
+  outline-offset: 2px;
+}
+
+/* responsivo */
+@media (max-width: 560px) {
+  .newEnterprice {
+    padding: 20px;
+  }
+
+  .newEnterprice .ipt {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .newEnterprice .separation {
+    width: 100%;
+  }
+
+  .newEnterprice .ipt:last-of-type {
+    align-items: stretch;
+  }
+
+  .newEnterprice .btns {
+    width: 100%;
+  }
+
+  .newEnterprice .btns button {
+    flex: 1;
+  }
+}
