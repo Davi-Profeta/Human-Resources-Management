@@ -1,0 +1,253 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+:root {
+  --cor-primaria: #2F5BEA;
+  --cor-primaria-escura: #1E40AF;
+  --cor-primaria-clara: #E8EEFE;
+  --cor-destaque: #14B8A6;
+  --cor-menu: #0F172A;
+  --cor-fundo: #F6F8FB;
+  --cor-superficie: #FFFFFF;
+  --cor-texto: #1F2937;
+  --cor-texto-suave: #6B7280;
+  --cor-borda: #E5E7EB;
+  --cor-sucesso: #16A34A;
+  --cor-alerta: #F59E0B;
+  --cor-erro: #DC2626;
+    --fonte-base: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* campos e botões usam a mesma fonte do resto da página */
+input,
+button{
+    font-family: inherit;
+}
+
+main{
+    width: 100%;
+    min-height: 100dvh;      /* sem altura fixa: a página cresce se faltar espaço */
+    display: flex;
+    background-color: var(--cor-fundo);
+    font-family: var(--fonte-base);
+}
+
+/*================ LADO ESQUERDO: ESPAÇO DO CARROSSEL ================*/
+/* fica em branco por enquanto; o carrossel entra aqui depois */
+.carrossel{
+    flex: 1 1 50%;
+    background-color: var(--cor-fundo);
+}
+
+/*====================== LADO DIREITO: LOGIN =========================*/
+.login{
+    position: relative;
+    min-width: 0;
+    flex: 1 1 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    color: var(--cor-primaria-clara);
+    /* fundo com leve brilho azul/verde para dar profundidade */
+    background:
+        radial-gradient(circle at 85% 8%, rgba(47, 91, 234, 0.28), transparent 45%),
+        radial-gradient(circle at 10% 95%, rgba(20, 184, 166, 0.14), transparent 45%),
+        var(--cor-menu);
+    box-shadow: -12px 0 40px rgba(15, 23, 42, 0.18);
+}
+
+.container{
+    width: 100%;
+    min-width: 0;
+    max-width: 420px;
+    padding: 2.25rem 2rem;
+    border: 1px solid rgba(232, 238, 254, 0.1);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.boas{
+    margin-bottom: 1.75rem;
+}
+
+.selo{
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 1.25rem;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--cor-primaria), var(--cor-destaque));
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(47, 91, 234, 0.4);
+}
+
+.boas h3{
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+.boas p{
+    margin-top: 0.4rem;
+    font-size: 0.95rem;
+    opacity: 0.7;
+}
+
+.form{
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.input{
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.input label{
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    opacity: 0.85;
+}
+
+.ipt{
+    width: 100%;
+    min-width: 0;
+    height: 3rem;
+    padding: 0 0.9rem;
+    border: solid 1.5px rgba(232, 238, 254, 0.18);
+    border-radius: 12px;
+    background-color: rgba(15, 23, 42, 0.6);
+    color: var(--cor-fundo);
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.ipt:hover{
+    border-color: rgba(232, 238, 254, 0.35);
+}
+
+.ipt:focus{
+    outline: none;
+    border-color: var(--cor-primaria);
+    background-color: rgba(15, 23, 42, 0.9);
+    box-shadow: 0 0 0 4px rgba(47, 91, 234, 0.3);
+}
+
+/* preenchimento automático do navegador mantém o tema escuro */
+.ipt:-webkit-autofill{
+    -webkit-text-fill-color: var(--cor-fundo);
+    transition: background-color 99999s ease-in-out 0s;
+}
+
+.options{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    margin-top: -0.4rem;
+}
+
+.options a{
+    font-size: 0.875rem;
+    text-decoration: none;
+    color: var(--cor-alerta);
+}
+
+.options a:hover{
+    text-decoration: underline;
+}
+
+.options a:focus-visible{
+    outline: solid 2px var(--cor-destaque);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+.confirm{
+    display: flex;
+    justify-content: center;
+}
+
+#btn{
+    width: 100%;
+    height: 3.1rem;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(47, 91, 234, 0.35);
+    transition: transform 0.15s, box-shadow 0.2s, filter 0.2s;
+}
+
+#btn:hover{
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+    box-shadow: 0 12px 26px rgba(47, 91, 234, 0.45);
+}
+
+#btn:active{
+    transform: translateY(0);
+}
+
+#btn:focus-visible{
+    outline: solid 2px var(--cor-destaque);
+    outline-offset: 3px;
+}
+
+.rodape{
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.4;
+}
+
+/*======================= ERRO =======================*/
+.mensagem-erro{
+    flex-basis: 100%;
+    padding: 0.6rem 0.8rem;
+    border: solid 1px var(--cor-erro);
+    border-radius: 8px;
+    background-color: rgba(220, 38, 38, 0.15);
+    color: #FCA5A5;
+    font-size: 0.9rem;
+}
+
+/*======================= CELULAR / TABLET PEQUENO =======================*/
+@media (max-width: 768px){
+
+    /* o espaço do carrossel some e o login ocupa a tela toda */
+    .carrossel{
+        display: none;
+    }
+
+    .login{
+        flex-basis: 100%;
+        padding: 24px 16px 56px;
+        box-shadow: none;
+    }
+
+    .container{
+        padding: 1.75rem 1.25rem;
+    }
+
+}

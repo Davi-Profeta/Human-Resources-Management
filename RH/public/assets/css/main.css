@@ -1,0 +1,151 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --cor-primaria: #ea2f2f;
+  --cor-primaria-escura: #af1e1e;
+  --cor-primaria-clara: #fee8e8;
+  --cor-destaque: #14b8a6;
+  --cor-menu: #0f172a;
+  --cor-fundo: #f6f8fb;
+  --cor-superficie: #ffffff;
+  --cor-texto: #1f2937;
+  --cor-texto-suave: #6b7280;
+  --cor-borda: #e5e7eb;
+  --cor-sucesso: #16a34a;
+  --cor-alerta: #f59e0b;
+  --cor-erro: #dc2626;
+  --fonte-base:
+    "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --sidebar-fechada: 72px;
+  --sidebar-aberta: 200px;
+}
+
+main {
+  width: 100%;
+  height: 100dvh; /* ocupa exatamente a altura visível da tela */
+  display: flex;
+  background-color: var(--cor-fundo);
+  font-family: var(--fonte-base);
+}
+
+section {
+  width: var(--sidebar-fechada);
+  height: 100%;
+  flex-shrink: 0; /* a barra não é espremida pelo iframe */
+  overflow: hidden; /* esconde o texto enquanto a barra é estreita */
+  background-color: var(--cor-menu);
+  transition: 0.4s ease-in-out;
+  padding: 2px;
+}
+section:hover {
+  width: var(--sidebar-aberta);
+  cursor: pointer;
+}
+
+section a {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.borderS {
+  border: solid 2px #6b7280;
+  height: 100%;
+  overflow: hidden;
+}
+
+.logo {
+  height: 10dvh;
+}
+
+.page {
+  display: flex;
+  align-items: center;
+  height: 7dvh;
+  min-height: 2.5rem;
+  color: #fff;
+  white-space: nowrap;
+  margin-bottom: 0.5dvh;
+  border-radius: 8px;
+
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.page:hover {
+  background-color: rgba(47, 91, 234, 0.25);
+  color: #fff;
+}
+
+.page .icone {
+  transition: transform 0.3s ease;
+}
+
+.page:hover .icone {
+  transform: translateX(4px);
+}
+
+.icone {
+  width: var(--sidebar-fechada);
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+}
+.icone svg {
+  width: 1.6rem;
+  height: 1.6rem;
+  flex-shrink: 0;
+}
+
+.texto {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+section:hover .texto {
+  opacity: 1;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+main {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.container {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.container iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.container {
+  flex: 1;
+  min-width: 0;
+}
+.container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+#iframe {
+  text-decoration: none;
+}
