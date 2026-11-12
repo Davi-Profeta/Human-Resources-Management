@@ -1,0 +1,174 @@
+dialog.user {
+  position: fixed;
+  position-anchor: --profile;
+  inset: auto;
+  top: anchor(bottom);
+  right: anchor(right);
+  margin: 12px 0 0;
+
+  width: 280px;
+  padding: 22px 20px 20px;
+  background: linear-gradient(180deg, #16213a 0%, #111a2e 100%);
+  color: var(--cor-fundo);
+  border: 1px solid rgba(246, 248, 251, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  font-family: var(--fonte-base);
+  overflow: visible; /* deixa a setinha aparecer */
+}
+
+dialog.user[open] {
+  animation: abrirUser 0.16s ease-out;
+}
+
+@keyframes abrirUser {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog.user[open] {
+    animation: none;
+  }
+}
+
+dialog.user::backdrop {
+  background: transparent;
+}
+
+/* setinha apontando para a bolinha */
+dialog.user::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  right: 14px;
+  width: 12px;
+  height: 12px;
+  background: #16213a;
+  border-top: 1px solid rgba(246, 248, 251, 0.1);
+  border-left: 1px solid rgba(246, 248, 251, 0.1);
+  transform: rotate(45deg);
+}
+
+dialog.user button {
+  font-family: inherit;
+}
+
+/* ---------- Informações ---------- */
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(246, 248, 251, 0.1);
+}
+
+/* 1º item: nome */
+.user-info > :first-child {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+/* 2º item: email */
+.user-info > :nth-child(2) {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  word-break: break-all;
+}
+
+/* último item: Online, com pontinho verde */
+.user-info > :last-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(22, 163, 74, 0.15);
+  color: #86efac;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.user-info > :last-child::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--cor-sucesso);
+}
+
+/* ---------- Botões ---------- */
+.user-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.user-actions button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+}
+
+#logout {
+  background: transparent;
+  color: #fca5a5;
+  border: 1px solid var(--cor-erro);
+}
+
+#logout:hover {
+  background: var(--cor-erro);
+  color: #fff;
+}
+
+#closeUser {
+  background: rgba(246, 248, 251, 0.08);
+  color: var(--cor-fundo);
+  border: 1px solid transparent;
+}
+
+#closeUser:hover {
+  background: rgba(246, 248, 251, 0.16);
+}
+
+.user-actions button:focus {
+  outline: none;
+}
+
+.user-actions button:focus-visible {
+  outline: 2px solid var(--cor-destaque);
+  outline-offset: 2px;
+}
+
+.user-info > :first-child {
+  display: none; /* só se for mesmo um elemento vazio */
+}
+
+.user-info > :nth-child(2) {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--cor-fundo);
+}
+
+.user-info > :nth-child(3) {    
+  font-size: 0.85rem;
+  color: #94a3b8;
+  word-break: break-all;
+}
