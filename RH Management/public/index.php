@@ -1,61 +1,57 @@
 <?php
-    require_once "../src/config/conexao.php";
-    session_start();
+require_once "../src/config/conexao.php";
+session_start();
 
-    $erro = "";
+$erro = "";
 
-    if($_SERVER ['REQUEST_METHOD'] === "POST"){
+if ($_SERVER['REQUEST_METHOD'] === "POST") {
 
-        $User = $_POST['user'];
-        $Senha = $_POST['password'];
-        $Nivel = "";
+    $User = $_POST['user'];
+    $Senha = $_POST['password'];
+    $Nivel = "";
 
-        if ($User === '' || $Senha === '') {
+    if ($User === '' || $Senha === '') {
 
-            $erro = "Preencha o usuário e a senha."; 
+        $erro = "Preencha o usuário e a senha.";
+    } else {
 
-        } else {
-
-            $buscar = ("SELECT *
+        $buscar = ("SELECT *
             FROM acessos
             WHERE nome_user = ? AND senha = ?");
 
-            $stmtB = $pdo->prepare($buscar);
-            $stmtB->execute([$User, $Senha]);
-            $usuario = $stmtB->fetch(PDO::FETCH_BOTH);
+        $stmtB = $pdo->prepare($buscar);
+        $stmtB->execute([$User, $Senha]);
+        $usuario = $stmtB->fetch(PDO::FETCH_BOTH);
 
-            if(!$usuario){
-                $erro = "Usuário ou senha incorretos!";
-            } else {
+        if (!$usuario) {
+            $erro = "Usuário ou senha incorretos!";
+        } else {
 
-                $Nivel = $usuario['nivel'];
+            $Nivel = $usuario['nivel'];
 
-                if($Nivel == 1){
+            if ($Nivel == 1) {
 
-                    $_SESSION['User'] = $User;
-                    $_SESSION['Nivel'] = $Nivel;
-                    $_SESSION['Email'] = $usuario['email'];
-                    header("Location: mainAdm.php");
-                    exit();
+                $_SESSION['User'] = $User;
+                $_SESSION['Nivel'] = $Nivel;
+                $_SESSION['Email'] = $usuario['email'];
+                header("Location: mainAdm.php");
+                exit();
+            } else if ($Nivel == 2) {
 
-                } else if ($Nivel == 2){
-
-                    $_SESSION['User'] = $User;
-                    $_SESSION['Nivel'] = $Nivel;
-                    header("Location: main.php");
-                    exit();
-
-                };
-
-            }
-
-        };
-    }
+                $_SESSION['User'] = $User;
+                $_SESSION['Nivel'] = $Nivel;
+                header("Location: main.php");
+                exit();
+            };
+        }
+    };
+}
 
 ?>
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
 
     <meta charset="UTF-8">
@@ -78,10 +74,15 @@
         <section class="login">
 
             <div class="container">
-                
+
                 <div class="boas">
                     <div class="selo" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
                     </div>
                     <h3> Bem-vindo! </h3>
                     <p>Faça login para acessar o sistema!</p>
@@ -92,8 +93,9 @@
                     <div class="input">
                         <label for="user">Usuário</label>
                         <input class="ipt" type="text" name="user" id="user" maxlength="100" required autofocus autocomplete="username"
-                               value="<?= htmlspecialchars($_POST['user'] ?? '') ?>">
+                            value="<?= htmlspecialchars($_POST['user'] ?? '') ?>">
                     </div>
+
 
                     <div class="input">
                         <label for="password">Senha</label>
@@ -105,12 +107,22 @@
 
                             <button type="button" id="mostrarSenha"
                                 aria-label="Mostrar senha" aria-pressed="false">
-                                <svg width="22" height="22" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor"
-                                    stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round">
+
+                                <!-- olho aberto -->
+                                <svg class="icone-aberto" width="22" height="22" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
                                     <circle cx="12" cy="12" r="3" />
+                                </svg>
+
+                                <!-- olho cortado -->
+                                <svg class="icone-cortado" width="22" height="22" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                    <line x1="3" y1="3" x2="21" y2="21" />
                                 </svg>
                             </button>
                         </div>
@@ -120,9 +132,9 @@
                         <a href="#">Esqueceu a senha?</a>
                         <?php
 
-                            if($erro){
-                                echo "<p class='mensagem-erro' role='alert'>" . htmlspecialchars($erro) . "</p>";
-                            };
+                        if ($erro) {
+                            echo "<p class='mensagem-erro' role='alert'>" . htmlspecialchars($erro) . "</p>";
+                        };
 
                         ?>
                     </div>
@@ -135,7 +147,8 @@
 
             </div>
         </section>
-             <script>
+
+        <script>
             const senha = document.getElementById("password");
             const botao = document.getElementById("mostrarSenha");
 
@@ -152,9 +165,8 @@
                 botao.setAttribute("aria-pressed", String(mostrar));
             });
         </script>
-        
     </main>
-    
+
 </body>
 
 </html>
