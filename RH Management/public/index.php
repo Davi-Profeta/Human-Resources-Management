@@ -97,7 +97,23 @@
 
                     <div class="input">
                         <label for="password">Senha</label>
-                        <input class="ipt" type="password" name="password" id="password" required autocomplete="current-password">
+
+                        <div class="campo-senha">
+                            <input class="ipt" type="password"
+                                name="password" id="password"
+                                required autocomplete="current-password">
+
+                            <button type="button" id="mostrarSenha"
+                                aria-label="Mostrar senha" aria-pressed="false">
+                                <svg width="22" height="22" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="options">
