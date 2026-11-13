@@ -119,7 +119,24 @@
 
             </div>
         </section>
-    
+             <script>
+            const senha = document.getElementById("password");
+            const botao = document.getElementById("mostrarSenha");
+
+            botao.addEventListener("click", () => {
+                const mostrar = senha.type === "password";
+
+                senha.type = mostrar ? "text" : "password";
+
+                botao.setAttribute(
+                    "aria-label",
+                    mostrar ? "Ocultar senha" : "Mostrar senha"
+                );
+
+                botao.setAttribute("aria-pressed", String(mostrar));
+            });
+        </script>
+        
     </main>
     
 </body>
