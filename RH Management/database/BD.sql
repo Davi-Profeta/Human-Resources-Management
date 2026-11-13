@@ -123,7 +123,8 @@ CREATE TABLE colaboradores (
         REFERENCES statuss(id_status),
 
     FOREIGN KEY (id_beneficios)
-        REFERENCES beneficios(id_beneficios)
+        REFERENCES beneficios(id_beneficios),
+    img VARCHAR(500)
 );
 
 -- ==========================================
