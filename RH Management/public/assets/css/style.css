@@ -73,6 +73,17 @@ main{
   color: #2f5bea;
 }
 
+#mostrarSenha .icone-cortado {
+  display: none;
+}
+#mostrarSenha[aria-pressed="true"] .icone-aberto {
+  display: none;
+}
+
+#mostrarSenha[aria-pressed="true"] .icone-cortado {
+  display: block;
+}
+
 /*====================== LADO DIREITO: LOGIN =========================*/
 .login{
     position: relative;
