@@ -42,6 +42,37 @@ main{
     background-color: var(--cor-fundo);
 }
 
+/*================ MOSTRAR SENHA ================*/
+.campo-senha {
+  position: relative;
+  width: 100%;
+}
+
+.campo-senha .ipt {
+  width: 100%;
+  padding-right: 50px;
+}
+
+#mostrarSenha {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+}
+
+#mostrarSenha:hover {
+  color: #2f5bea;
+}
+
 /*====================== LADO DIREITO: LOGIN =========================*/
 .login{
     position: relative;
