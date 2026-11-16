@@ -206,6 +206,21 @@ VALUES
     ('Inativo');
 
 -- ==========================================
+-- INSERÇÃO DOS VÍNCULOS
+-- ==========================================
+
+INSERT INTO tipo_vinculo (nome_vinculo)
+SELECT t.nome
+FROM (
+    SELECT 'CLT' AS nome
+    UNION ALL SELECT 'PJ'
+    UNION ALL SELECT 'Estágio'
+    UNION ALL SELECT 'Temporário'
+    UNION ALL SELECT 'Autônomo'
+) t
+WHERE NOT EXISTS (SELECT 1 FROM tipo_vinculo);
+
+-- ==========================================
 -- INSERÇÃO DOS BENEFÍCIOS INICIAIS
 -- ==========================================
 
