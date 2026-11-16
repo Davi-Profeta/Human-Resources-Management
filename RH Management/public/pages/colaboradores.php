@@ -14,15 +14,33 @@
             $Email = $_POST['email'];
             $Endereco = $_POST['local'];
             $Tel = $_POST['tel'];
-            $Photo = $_POST['photo'];
 
-            $stmtC = $pdo->prepare("INSERT INTO colaboradores(nome_user, CPF, email, endereco, telefone, img)
+            $Photo = null;
+
+            if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+
+                $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+
+                if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
+
+                    $pasta = "../assets/uploads/";
+                    if (!is_dir($pasta)) mkdir($pasta, 0777, true);
+
+                    $Photo = uniqid() . "." . $ext; // nome único, evita sobrescrever
+                    move_uploaded_file($_FILES['photo']['tmp_name'], $pasta . $Photo);
+
+                }
+
+            }
+
+            $stmtC = $pdo->prepare("INSERT INTO colaboradores(nome_user, CPF, email, endereço, telefone, img)
             VALUES (?, ?, ?, ?, ?, ?)");
             $stmtC->execute([$Name, $CPF, $Email, $Endereco, $Tel, $Photo]);
 
+            
 
         };
-        
+
 
     };
 
@@ -98,56 +116,51 @@
 
             <div class="colaboradores">
 
-                <!-- <?php
+                <?php
 
                     $stmt = $pdo->prepare("SELECT *
                     FROM colaboradores
-                    INNER JOIN vinculo_trabalista ON colaboradores.id_trabalista = vinculo_trabalista.id_trabalista
-                    INNER JOIN statuss ON colaboradores.id_status = statuss.id_status
-                    INNER JOIN empresas ON empresas.id_empresas = colaboradores.id_empresa;");
+                    LEFT JOIN vinculo_trabalista ON colaboradores.id_trabalista = vinculo_trabalista.id_trabalista
+                    LEFT JOIN statuss ON colaboradores.id_status = statuss.id_status
+                    LEFT JOIN empresas ON empresas.id_empresas = colaboradores.id_empresa;");
                     $stmt->execute();
 
                     $colaboradores = $stmt->fetchAll(PDO::FETCH_BOTH);
 
                     foreach ($colaboradores as $i){
 
+                        $nome    = $i['nome_user'];
+                        $cargo   = $i['cargo'] ?? 'Sem cargo';
+                        $empresa = $i['nome_empresas'] ?? 'Sem empresa';
+                        $status  = $i['status_agora'] ?? 'Sem vínculo';
+
+                        // classe do selo e do filtro
+                        $classe = 'inativo';
+                        if (strtolower($status) === 'ativo') $classe = 'ativo';
+                        if (!isset($i['status_agora']))      $classe = 'sem';
+
+                        $foto = $i['img']
+                            ? "<img src='../assets/uploads/{$i['img']}' alt=''>"
+                            : "<span>" . strtoupper(substr($i['nome_user'], 0, 2)) . "</span>";
+
                         echo "
-                            <div class='person' tabindex='0'>
+                            <div class='person' tabindex='0' data-status='{$classe}'>
 
-                            <div class='photo'>
-                                <span>{$i['img']}</span>
+                                <div class='photo'>{$foto}</div>
+
+                                <div class='dados'>
+                                    <h3>{$nome}</h3>
+                                    <p class='cargo'>{$cargo}</p>
+                                    <p class='empresa'>{$empresa}</p>
+                                    <span class='status {$classe}'>{$status}</span>
+                                </div>
+
                             </div>
-
-                            <div class='dados'>
-                                <h3>{$i['nome_user']}</h3>
-                                <p class='cargo'>{$i['cargo']}</p>
-                                <p class='empresa'>{$i['nome_empresas']}</p>
-                                <span class='status'>{$i['status_agora']}</span>
-                            </div>
-
-                        </div>
                         ";
 
-                    };
+                    }
 
-                   
-
-                ?> -->
-
-                <div class="person" tabindex="0" data-status="ativo">
-
-                    <div class="photo">
-                        <span>AL</span>
-                    </div>
-
-                    <div class="dados">
-                        <h3>Ana Beatriz Lima</h3>
-                        <p class="cargo">Analista de RH</p>
-                        <p class="empresa">Horizonte Construtora</p>
-                        <span class="status ativo">Ativo</span>
-                    </div>
-
-                </div>
+                ?> 
 
                 <div class="person" tabindex="0" data-status="ativo">
 
@@ -259,7 +272,7 @@
 
             <div class="abaIMG">
                 <label for="">Foto colaborador</label>
-                <input type="file" name="photo" id="">
+                <input type="file" name="photo" id="" accept="image/*">
             </div>
 
             <div class="aba">
@@ -271,7 +284,7 @@
 
                 <div class="inputs">
                     <label for="">CPF</label>
-                    <input type="number" name="cpf" id="">
+                    <input maxlength="11" type="num" name="cpf" id="">
                 </div>
 
             </div>
@@ -294,7 +307,7 @@
 
                 <div class="inputs">
                     <label for="">Telefone</label>
-                    <input type="number" name="tel" id="">
+                    <input maxlength="13" type="number" name="tel" id="">
                 </div>
 
             </div>
