@@ -3,6 +3,29 @@
     require_once "../../src/config/conexao.php";
     session_start();
 
+    if($_SERVER ['REQUEST_METHOD'] === 'POST'){
+
+        $Acao = $_POST['acao'];
+
+        if($Acao === "create"){
+
+            $Name = $_POST['name'];
+            $CPF = $_POST['cpf'];
+            $Email = $_POST['email'];
+            $Endereco = $_POST['local'];
+            $Tel = $_POST['tel'];
+            $Photo = $_POST['photo'];
+
+            $stmtC = $pdo->prepare("INSERT INTO colaboradores(nome_user, CPF, email, endereco, telefone, img)
+            VALUES (?, ?, ?, ?, ?, ?)");
+            $stmtC->execute([$Name, $CPF, $Email, $Endereco, $Tel, $Photo]);
+
+
+        };
+        
+
+    };
+
 ?>
 
 <!DOCTYPE html>
@@ -274,112 +297,22 @@
                     <input type="number" name="tel" id="">
                 </div>
 
-                <div class="inputs">
-                    <label for="">Empresa</label>
-                    <select name="empresa" id="">
-                        <option selected disabled value="">Selecione uma empresa</option>
-                       
-                        <?php
-
-                            $stmtE = $pdo->prepare("SELECT *
-                            FROM empresas");
-                            $stmtE->execute();
-
-                            $empresas = $stmtE->fetchAll(PDO::FETCH_BOTH);
-
-                            foreach($empresas as $i){
-
-                                echo "
-                                    <option name='{$i['id_empresas']}'> {$i['nome_empresas']} </option>
-                                ";
-
-                            };
-
-                        ?>
-
-                    </select>
-                </div>
-
             </div>
 
             <div class="aba">
 
-                <div class="inputs">
-                    <label for="">Benefícios</label>
-                    <select name="beneficio" id="">
-                        <option value="">Selecione um benefício</option>
+                <p class='erro' id="erro">  </p>
+                <input type="hidden" name="id" id="idColaborador">
 
-                        <?php
-
-                            $stmtB = $pdo->prepare("SELECT *
-                            FROM beneficios");
-                            $stmtB->execute();
-
-                            $beneficios = $stmtB->fetchAll(PDO::FETCH_BOTH);
-
-                            foreach($beneficios as $i){
-
-                                echo "
-                                    <option name='{$i['id_beneficios']}'> {$i['nome_beneficios']} </option>
-                                ";
-
-                            };
-
-                        ?>
-
-                    </select>
-                </div>
-
-                <div class="inputs">
-                    <label for="">Status</label>
-                    <select name="status" id="">
-                        <option selected disabled value="">Selecione um status</option>
-                        <option value="1">Ativo</option>
-                        <option value="2">Inativo</option>
-                    </select>
+                <div class="btns">
+                    <button type="submit">Confirmar</button>
+                    <button type="button" id="cancelColaborador">Cancelar</button>
                 </div>
 
             </div>
 
-             <div class="aba">
-
-                <div class="inputs">
-                    <label for="">Vínculo</label>
-                    <select name="vinculo" id="">
-                        <option value="">Selecione um vínculo</option>
-
-                        <?php
-
-                            $stmtV = $pdo->prepare("SELECT *
-                            FROM vinculo_trabalista");
-                            $stmtV->execute();
-
-                            $vinculo = $stmtV->fetchAll(PDO::FETCH_BOTH);
-
-                            foreach($vinculo as $i){
-
-                                echo "
-                                    <option name='{$i['id_vinculo']}'> {$i['cargo']} </option>
-                                ";
-
-                            };
-
-                        ?>
-
-                    </select>
-                </div>
-
-                <div class="inputs">
-                    <label for="">Status</label>
-                    <select name="status" id="">
-                        <option selected disabled value="">Selecione um status</option>
-                        <option value="1">Ativo</option>
-                        <option value="2">Inativo</option>
-                    </select>
-                </div>
-
-            </div>
-
+            <!-- input para ação no PHP -->
+            <input type="hidden" name="acao" value="create">
 
         </form>
 
