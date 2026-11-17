@@ -42,6 +42,44 @@
         };
 
 
+        // ===== NOVO: atualizar colaborador =====
+        if($Acao === "update"){
+
+            $Id = $_POST['id'];
+            $Name = $_POST['name'];
+            $CPF = $_POST['cpf'];
+            $Email = $_POST['email'];
+            $Endereco = $_POST['local'];
+            $Tel = $_POST['tel'];
+
+            $stmtU = $pdo->prepare("UPDATE colaboradores
+            SET nome_user = ?, CPF = ?, email = ?, endereço = ?, telefone = ?
+            WHERE id_colaboradores = ?");
+            $stmtU->execute([$Name, $CPF, $Email, $Endereco, $Tel, $Id]);
+
+            // só troca a foto se uma nova foi enviada
+            if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+
+                $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+
+                if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
+
+                    $pasta = "../assets/uploads/";
+                    if (!is_dir($pasta)) mkdir($pasta, 0777, true);
+
+                    $Photo = uniqid() . "." . $ext;
+                    move_uploaded_file($_FILES['photo']['tmp_name'], $pasta . $Photo);
+
+                    $stmtP = $pdo->prepare("UPDATE colaboradores SET img = ? WHERE id_colaboradores = ?");
+                    $stmtP->execute([$Photo, $Id]);
+
+                }
+
+            }
+
+        };
+
+
     };
 
 ?>
@@ -102,7 +140,7 @@
 
         <section>
 
-            <input placeholder="Pesquise por nome, cargo ou empresa" type="search" id="ipt" aria-label="Pesquisar colaboradores">
+            <input placeholder="Pesquise por nome" type="search" id="ipt" aria-label="Pesquisar colaboradores">
 
             <select id="filtroStatus" aria-label="Filtrar por status">
                 <option value="">Todos os status</option>
@@ -118,7 +156,10 @@
 
                 <?php
 
-                    $stmt = $pdo->prepare("SELECT *
+                   $stmt = $pdo->prepare("SELECT colaboradores.*,
+                        vinculo_trabalista.cargo,
+                        empresas.nome_empresas,
+                        statuss.status_agora
                     FROM colaboradores
                     LEFT JOIN vinculo_trabalista ON colaboradores.id_trabalista = vinculo_trabalista.id_trabalista
                     LEFT JOIN statuss ON colaboradores.id_status = statuss.id_status
@@ -133,8 +174,8 @@
                         $cargo   = $i['cargo'] ?? 'Sem cargo';
                         $empresa = $i['nome_empresas'] ?? 'Sem empresa';
                         $status  = $i['status_agora'] ?? 'Sem vínculo';
+                        $Id = $i['id_colaboradores'];
 
-                        // classe do selo e do filtro
                         $classe = 'inativo';
                         if (strtolower($status) === 'ativo') $classe = 'ativo';
                         if (!isset($i['status_agora']))      $classe = 'sem';
@@ -143,8 +184,14 @@
                             ? "<img src='../assets/uploads/{$i['img']}' alt=''>"
                             : "<span>" . strtoupper(substr($i['nome_user'], 0, 2)) . "</span>";
 
+                        $dNome  = htmlspecialchars($nome, ENT_QUOTES, 'UTF-8');
+                        $dCpf   = htmlspecialchars($i['CPF'] ?? '', ENT_QUOTES, 'UTF-8');
+                        $dEmail = htmlspecialchars($i['email'] ?? '', ENT_QUOTES, 'UTF-8');
+                        $dLocal = htmlspecialchars($i['endereço'] ?? '', ENT_QUOTES, 'UTF-8');
+                        $dTel   = htmlspecialchars($i['telefone'] ?? '', ENT_QUOTES, 'UTF-8');
+
                         echo "
-                            <div class='person' tabindex='0' data-status='{$classe}'>
+                            <div class='person' tabindex='0' data-id='{$Id}' data-status='{$classe}' data-nome='{$dNome}' data-cpf='{$dCpf}' data-email='{$dEmail}' data-local='{$dLocal}' data-tel='{$dTel}'>
 
                                 <div class='photo'>{$foto}</div>
 
@@ -162,97 +209,6 @@
 
                 ?> 
 
-                <div class="person" tabindex="0" data-status="ativo">
-
-                    <div class="photo">
-                        <span>CS</span>
-                    </div>
-
-                    <div class="dados">
-                        <h3>Carlos Eduardo Souza</h3>
-                        <p class="cargo">Engenheiro civil</p>
-                        <p class="empresa">Horizonte Construtora</p>
-                        <span class="status ativo">Ativo</span>
-                    </div>
-
-                </div>
-
-                <div class="person" tabindex="0" data-status="inativo">
-
-                    <div class="photo">
-                        <span>FR</span>
-                    </div>
-
-                    <div class="dados">
-                        <h3>Fernanda Rocha</h3>
-                        <p class="cargo">Assistente financeiro</p>
-                        <p class="empresa">Tech Mineira</p>
-                        <span class="status inativo">Desligado</span>
-                    </div>
-
-                </div>
-
-                <div class="person" tabindex="0" data-status="ativo">
-
-                    <div class="photo">
-                        <span>JA</span>
-                    </div>
-
-                    <div class="dados">
-                        <h3>João Pedro Alves</h3>
-                        <p class="cargo">Desenvolvedor</p>
-                        <p class="empresa">Tech Mineira</p>
-                        <span class="status ativo">Ativo</span>
-                    </div>
-
-                </div>
-
-                <div class="person" tabindex="0" data-status="inativo">
-
-                    <div class="photo">
-                        <span>MC</span>
-                    </div>
-
-                    <div class="dados">
-                        <h3>Mariana Costa</h3>
-                        <p class="cargo">Sem cargo</p>
-                        <p class="empresa">Sem empresa</p>
-                        <span class="status sem">Sem vínculo</span>
-                    </div>
-
-                </div>
-
-                <div class="person" tabindex="0" data-status="ativo">
-
-                    <div class="photo">
-                        <span>RM</span>
-                    </div>
-
-                    <div class="dados">
-                        <h3>Rafael Mendes</h3>
-                        <p class="cargo">Analista de ponto</p>
-                        <p class="empresa">Horizonte Construtora</p>
-                        <span class="status ativo">Ativo</span>
-                    </div>
-
-                </div>
-
-                <div class="person" tabindex="0" data-status="ativo">
-
-                    <div class="photo">
-                        <span>RM</span>
-                    </div>
-
-                    <div class="dados">
-                        <h3>Rafael Mendes</h3>
-                        <p class="cargo">Analista de ponto</p>
-                        <p class="empresa">Horizonte Construtora</p>
-                        <span class="status ativo">Ativo</span>
-                    </div>
-
-                </div>
-                
-
                 <p class="vazio" hidden>Nenhum colaborador encontrado.</p>
 
             </div>
@@ -266,6 +222,76 @@
 
         <div class="title">
             <h3>Criar colaborador</h3>
+        </div>
+
+        <form action="colaboradores.php" method="post" enctype="multipart/form-data">
+
+            <div class="abaIMG">
+                <label for="">Foto colaborador</label>
+                <input type="file" name="photo" id="" accept="image/*">
+            </div>
+
+            <div class="aba">
+
+                <div class="inputs">
+                    <label for="">Nome colaorador</label>
+                    <input type="text" name="name" id="">
+                </div>
+
+                <div class="inputs">
+                    <label for="">CPF</label>
+                    <input maxlength="11" type="number" name="cpf" id="">
+                </div>
+
+            </div>
+
+            <div class="aba">
+
+                <div class="inputs">
+                    <label for="">Email</label>
+                    <input type="text" name="email" id="">
+                </div>
+
+                <div class="inputs">
+                    <label for="">Endereço</label>
+                    <input type="text" name="local" id="">
+                </div>
+
+            </div>
+
+            <div class="aba">
+
+                <div class="inputs">
+                    <label for="">Telefone</label>
+                    <input maxlength="13" type="number" name="tel" id="">
+                </div>
+
+            </div>
+
+            <div class="aba">
+
+                <p class='erro' id="erro">  </p>
+                <input type="hidden" name="id" id="idColaborador">
+
+                <div class="btns">
+                    <button type="submit">Confirmar</button>
+                    <button type="button" id="cancelColaborador">Cancelar</button>
+                </div>
+
+            </div>
+
+            <!-- input para ação no PHP -->
+            <input type="hidden" name="acao" value="create">
+
+        </form>
+
+    </dialog>
+
+
+    <dialog class="edit create">
+
+         <div class="title">
+            <h3>Editar colaborador</h3>
         </div>
 
         <form action="colaboradores.php" method="post" enctype="multipart/form-data">
@@ -319,13 +345,13 @@
 
                 <div class="btns">
                     <button type="submit">Confirmar</button>
-                    <button type="button" id="cancelColaborador">Cancelar</button>
+                    <button type="button" id="cancelEdit">Cancelar</button>
                 </div>
 
             </div>
 
-            <!-- input para ação no PHP -->
-            <input type="hidden" name="acao" value="create">
+           
+            <input type="hidden" name="acao" value="update">
 
         </form>
 
