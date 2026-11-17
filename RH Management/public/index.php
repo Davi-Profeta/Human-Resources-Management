@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
                             <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                         </svg>
                     </div>
-                    <span>RH Management</span>
+                    <span>Human Resources </span>
                     </div>
                     <span class="sobretitulo">SEU ESPAÇO DE TRABALHO</span>
                     <h1 id="titulo-login">Bom ter você por aqui.</h1>
@@ -153,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
                 <p class="ajuda">Precisa de acesso? Fale com o administrador.</p>
 
             </div>
-            <p class="rodape">RH Management · Gestão de pessoas</p>
+            <p class="rodape">Human Recources · Gestão de pessoas</p>
         </section>
 
         <script>
