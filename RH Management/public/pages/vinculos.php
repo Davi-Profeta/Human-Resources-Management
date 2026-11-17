@@ -63,6 +63,36 @@ function registrarHistorico($pdo, $idAcesso, $idEmpresa, $idRegistro, $tabela, $
     ]);
 }
 
+// deixa o status do colaborador ligado a este vínculo igual ao do vínculo (Ativo/Inativo)
+// e grava no histórico quando o status do colaborador realmente mudou
+function sincronizarStatusColaborador($pdo, $idAcesso, $idEmpresa, $idTrabalista, $novoStatus, $listaStatus)
+{
+
+    $busca = $pdo->prepare("SELECT id_colaboradores, id_status FROM colaboradores WHERE id_trabalista = ?");
+    $busca->execute([$idTrabalista]);
+
+    foreach ($busca->fetchAll() as $c) {
+
+        if ((int)$c['id_status'] === (int)$novoStatus) {
+            continue;
+        }
+
+        $up = $pdo->prepare("UPDATE colaboradores SET id_status = ? WHERE id_colaboradores = ?");
+        $up->execute([$novoStatus, $c['id_colaboradores']]);
+
+        registrarHistorico(
+            $pdo,
+            $idAcesso,
+            $idEmpresa,
+            $c['id_colaboradores'],
+            'colaboradores',
+            'id_status',
+            $listaStatus[$c['id_status']] ?? '',
+            $listaStatus[$novoStatus] ?? ''
+        );
+    }
+}
+
 // lê e valida os campos do formulário de vínculo (retorna null se algo estiver errado)
 function lerCamposVinculo($listaEmpresas, $listaTipos)
 {
@@ -200,6 +230,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $bancoPronto && $idAtivo !== false 
 
                     registrarHistorico($pdo, $idAcesso, $d['empresa'], $idNovo, 'vinculo_trabalista', 'cadastro', '', $c['nome_user'] . ' - ' . $d['cargo']);
 
+                    // colaborador passa a ter vínculo: o status dele acompanha o do vínculo (Ativo)
+                    sincronizarStatusColaborador($pdo, $idAcesso, $d['empresa'], $idNovo, statusPara($d['termino'], $hoje, $idAtivo, $idInativo), $listaStatus);
+
                     $pdo->commit();
                     $msgCodigo = 'criado';
                 }
@@ -253,6 +286,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $bancoPronto && $idAtivo !== false 
                     }
                 }
 
+                sincronizarStatusColaborador($pdo, $idAcesso, $d['empresa'], $id, $novoStatus, $listaStatus);
+
                 $pdo->commit();
                 $msgCodigo = 'editado';
             }
@@ -281,6 +316,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $bancoPronto && $idAtivo !== false 
                     registrarHistorico($pdo, $idAcesso, $v['id_empresa'], $id, 'vinculo_trabalista', 'id_status', $listaStatus[$v['id_status']] ?? '', $listaStatus[$novoStatus] ?? '');
                 }
 
+                sincronizarStatusColaborador($pdo, $idAcesso, $v['id_empresa'], $id, $novoStatus, $listaStatus);
+
                 $msgCodigo = 'encerrado';
             }
         }
@@ -297,6 +334,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $bancoPronto && $idAtivo !== false 
             if ($v) {
 
                 $pdo->beginTransaction();
+
+                // sem vínculo, o colaborador deixa de ficar ativo
+                sincronizarStatusColaborador($pdo, $idAcesso, $v['id_empresa'], $id, $idInativo, $listaStatus);
 
                 // solta o colaborador antes de apagar (a chave estrangeira não deixa apagar com ele ligado)
                 $solta = $pdo->prepare("UPDATE colaboradores SET id_trabalista = NULL WHERE id_trabalista = ?");
