@@ -58,24 +58,27 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
-    <title>Login</title>
+    <title>Entrar | RH Management</title>
 
+    <link rel="stylesheet" href="assets/css/animacoes.css">
+    <script src="assets/js/animacoes.js" defer></script>
 </head>
 
 <body>
 
     <main>
 
-        <!-- Espaço reservado para o carrossel (fica em branco por enquanto) -->
+        <!-- Área reservada para o futuro carrossel de imagens da empresa. -->
         <aside class="carrossel" aria-hidden="true"></aside>
 
-        <section class="login">
+        <section class="login" aria-labelledby="titulo-login">
 
             <div class="container">
 
                 <div class="boas">
+                    <div class="marca">
                     <div class="selo" aria-hidden="true">
                         <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -84,8 +87,11 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
                             <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                         </svg>
                     </div>
-                    <h3> Bem-vindo! </h3>
-                    <p>Faça login para acessar o sistema!</p>
+                    <span>RH Management</span>
+                    </div>
+                    <span class="sobretitulo">SEU ESPAÇO DE TRABALHO</span>
+                    <h1 id="titulo-login">Bom ter você por aqui.</h1>
+                    <p>Acesse sua conta para continuar.</p>
                 </div>
 
                 <form class="form" action="index.php" method="post">
@@ -129,7 +135,6 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
                     </div>
 
                     <div class="options">
-                        <a href="#">Esqueceu a senha?</a>
                         <?php
 
                         if ($erro) {
@@ -140,12 +145,15 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
                     </div>
 
                     <div class="confirm">
-                        <button id="btn" type="submit">Entrar</button>
+                        <button id="btn" type="submit">Entrar na minha conta</button>
                     </div>
 
                 </form>
 
+                <p class="ajuda">Precisa de acesso? Fale com o administrador.</p>
+
             </div>
+            <p class="rodape">RH Management · Gestão de pessoas</p>
         </section>
 
         <script>
