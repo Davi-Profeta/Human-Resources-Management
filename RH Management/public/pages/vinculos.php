@@ -378,6 +378,28 @@ if ($bancoPronto) {
     }
 }
 
+// benefícios de cada colaborador (tabela colaborador_beneficio): id_colaborador => [benefícios]
+// fica fora do bancoPronto: se a tabela não existir, a tela de vínculos continua funcionando
+$beneficiosPorColab = [];
+
+if ($bancoPronto) {
+
+    try {
+
+        $sqlBen = "SELECT cb.id_colaboradores, b.nome_beneficios, b.tipo, b.valor, b.desconto, s.status_agora AS status_ligacao
+                    FROM colaborador_beneficio cb
+                    JOIN beneficios b ON b.id_beneficios = cb.id_beneficios
+                    LEFT JOIN statuss s ON s.id_status = cb.id_status
+                    ORDER BY b.nome_beneficios";
+
+        foreach ($pdo->query($sqlBen) as $bn) {
+            $beneficiosPorColab[(int)$bn['id_colaboradores']][] = $bn;
+        }
+    } catch (PDOException $ex) {
+        $beneficiosPorColab = [];
+    }
+}
+
 $totalAtivos = 0;
 
 foreach ($vinculos as $v) {
@@ -512,7 +534,9 @@ foreach ($vinculos as $v) {
                     $nomeColab   = $v['nome_colab'] ?? 'Sem colaborador';
                     $nomeEmpresa = $v['nome_empresas'] ?? 'Sem empresa';
                     $nomeTipo    = $listaTipos[$v['id_tipo']] ?? '—';
-                    $textoBusca  = mb_strtolower($nomeColab . ' ' . $nomeEmpresa . ' ' . $v['cargo'] . ' ' . $nomeTipo);
+                    $listaBen    = $beneficiosPorColab[(int)($v['id_colab'] ?? 0)] ?? [];
+                    $nomesBen    = implode(' ', array_column($listaBen, 'nome_beneficios'));
+                    $textoBusca  = mb_strtolower($nomeColab . ' ' . $nomeEmpresa . ' ' . $v['cargo'] . ' ' . $nomeTipo . ' ' . $nomesBen);
 
                 ?>
 
@@ -571,6 +595,40 @@ foreach ($vinculos as $v) {
                                     <dd><?= $ativo ? 'Ativo' : 'Encerrado' ?></dd>
                                 </div>
                             </dl>
+
+                            <!-- benefícios que o colaborador deste vínculo recebe (só visualização) -->
+                            <div class="beneficios-vinculo">
+
+                                <h4>Benefícios <span>(<?= count($listaBen) ?>)</span></h4>
+
+                                <?php if ($listaBen): ?>
+
+                                    <ul>
+                                        <?php foreach ($listaBen as $bn):
+                                            $ligado = ($bn['status_ligacao'] ?? 'Ativo') === 'Ativo';
+                                        ?>
+                                            <li class="<?= $ligado ? '' : 'inativo' ?>">
+                                                <span class="ben-nome">
+                                                    <strong><?= e($bn['nome_beneficios']) ?></strong>
+                                                    <small><?= e($bn['tipo']) ?><?= $ligado ? '' : ' · Inativo' ?></small>
+                                                </span>
+                                                <span class="ben-valor">
+                                                    <?= moeda($bn['valor']) ?>
+                                                    <?php if ((float)$bn['desconto'] > 0): ?>
+                                                        <small>desconto <?= moeda($bn['desconto']) ?></small>
+                                                    <?php endif; ?>
+                                                </span>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+
+                                <?php else: ?>
+
+                                    <p class="sem-beneficio"><?= $v['id_colab'] === null ? 'Este vínculo não tem colaborador ligado.' : 'Nenhum benefício vinculado a este colaborador.' ?></p>
+
+                                <?php endif; ?>
+
+                            </div>
 
                             <div class="acoes-card">
 
