@@ -38,10 +38,33 @@
 
             </div>
 
+
         </header>
 
 
         <main>
+
+            <section class="indicadoresKpi" aria-label="Indicadores principais">
+
+                <article class="indicadorCard">
+                    <span>Colaboradores ativos</span>
+                    <strong id="kpiColaboradoresAtivos">—</strong>
+                    <small>Com vínculo ativo</small>
+                </article>
+
+                <article class="indicadorCard">
+                    <span>Empresas cadastradas</span>
+                    <strong id="kpiEmpresasCadastradas">—</strong>
+                    <small>Total de empresas no sistema</small>
+                </article>
+
+                <article class="indicadorCard">
+                    <span>Custo mensal total</span>
+                    <strong id="kpiCustoMensal">—</strong>
+                    <small>Salários + benefícios</small>
+                </article>
+
+            </section>
 
             <section class="card gastosGerais">
 
@@ -56,15 +79,18 @@
 
             </section>
 
-            <section class="card controlePonto">
+            <section class="card colaboradoresEmpresa">
 
                 <div class="cardTopo">
-                    <h3>Controle de Ponto e Frequência</h3>
-                    <p>Situação dos colaboradores hoje</p>
+                    <h3>Colaboradores por empresa</h3>
+                    <p>Quantidade de colaboradores vinculados a cada empresa</p>
                 </div>
 
                 <div class="grafico">
-                    <canvas id="graficoPonto"></canvas>
+                    <canvas id="graficoColaboradoresEmpresa"></canvas>
+                    <p id="avisoGraficoEmpresa" class="mensagemGrafico" hidden>
+                        A API precisa retornar o nome da empresa de cada colaborador.
+                    </p>
                 </div>
 
             </section>
