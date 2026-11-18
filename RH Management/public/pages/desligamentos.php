@@ -102,6 +102,7 @@ $aviso = $mensagens[$_GET['msg'] ?? ''] ?? null;
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
 
     <meta charset="UTF-8">
@@ -109,7 +110,8 @@ $aviso = $mensagens[$_GET['msg'] ?? ''] ?? null;
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/desligamentos.css?v=<?= filemtime(__DIR__ . '/../assets/css/desligamentos.css') ?>">
+    <link rel="stylesheet"
+        href="../assets/css/desligamentos.css?v=<?= filemtime(__DIR__ . '/../assets/css/desligamentos.css') ?>">
     <title>Desligamentos</title>
 
 </head>
@@ -121,42 +123,53 @@ $aviso = $mensagens[$_GET['msg'] ?? ''] ?? null;
         <header>
 
             <div class="titulo">
-                <div class="img"><?= icone('<path d="M2 21a8 8 0 0 1 13.292-6"/><circle cx="10" cy="8" r="5"/><path d="M22 19h-6"/>') ?></div>
+                <div class="img">
+                    <?= icone('<path d="M2 21a8 8 0 0 1 13.292-6"/><circle cx="10" cy="8" r="5"/><path d="M22 19h-6"/>') ?>
+                </div>
                 <div>
                     <h3>Desligamentos</h3>
                     <p>Histórico de desligamentos</p>
                 </div>
             </div>
 
-            <button type="button" id="novo" <?= $ativos ? '' : 'disabled' ?>>
+            <button type="button" id="novo" <?=$ativos ? '' : 'disabled' ?>>
                 <?= icone('<path d="M5 12h14"/><path d="M12 5v14"/>') ?> Registrar
             </button>
 
         </header>
 
         <?php if ($aviso): ?>
-            <p class="aviso <?= $aviso[0] ?>" role="status"><?= e($aviso[1]) ?></p>
+        <p class="aviso <?= $aviso[0] ?>" role="status">
+            <?= e($aviso[1]) ?>
+        </p>
         <?php endif; ?>
 
         <div class="resumo">
             <div class="card">
                 <?= icone('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>') ?>
                 <span>Total</span>
-                <strong><?= $total ?></strong>
+                <strong>
+                    <?= $total ?>
+                </strong>
             </div>
             <div class="card">
                 <?= icone('<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>') ?>
                 <span>Neste mês</span>
-                <strong><?= $noMes ?></strong>
+                <strong>
+                    <?= $noMes ?>
+                </strong>
             </div>
             <div class="card">
                 <?= icone('<path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/>') ?>
                 <span>Empresas</span>
-                <strong><?= $empresas ?></strong>
+                <strong>
+                    <?= $empresas ?>
+                </strong>
             </div>
         </div>
 
-        <input type="search" id="ipt" placeholder="Pesquisar colaborador, empresa ou motivo..." aria-label="Pesquisar desligamentos">
+        <input type="search" id="ipt" placeholder="Pesquisar colaborador, empresa ou motivo..."
+            aria-label="Pesquisar desligamentos">
 
         <main>
 
@@ -164,30 +177,58 @@ $aviso = $mensagens[$_GET['msg'] ?? ''] ?? null;
 
                 <?php foreach ($desligamentos as $d): ?>
 
-                    <details class="desligamento" data-busca="<?= e(mb_strtolower($d['nome'] . ' ' . $d['empresa'] . ' ' . $d['motivo'] . ' ' . $d['cargo'])) ?>">
+                <details class="desligamento"
+                    data-busca="<?= e(mb_strtolower($d['nome'] . ' ' . $d['empresa'] . ' ' . $d['motivo'] . ' ' . $d['cargo'])) ?>">
 
-                        <summary>
-                            <span class="foto"><?= icone('<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>') ?></span>
-                            <span class="quem">
-                                <strong><?= e($d['nome']) ?></strong>
-                                <small><?= e($d['cargo'] ?: 'Sem cargo') ?> · <?= e($d['empresa'] ?: 'Sem empresa') ?></small>
-                            </span>
-                            <span class="badge">Desligado</span>
-                            <?= icone('<path d="m6 9 6 6 6-6"/>') ?>
-                        </summary>
+                    <summary>
+                        <span class="foto">
+                            <?= icone('<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>') ?>
+                        </span>
+                        <span class="quem">
+                            <strong>
+                                <?= e($d['nome']) ?>
+                            </strong>
+                            <small>
+                                <?= e($d['cargo'] ?: 'Sem cargo') ?> ·
+                                <?= e($d['empresa'] ?: 'Sem empresa') ?>
+                            </small>
+                        </span>
+                        <span class="badge">Desligado</span>
+                        <?= icone('<path d="m6 9 6 6 6-6"/>') ?>
+                    </summary>
 
-                        <dl class="info">
-                            <div><dt>Data do desligamento</dt><dd><?= date('d/m/Y', strtotime($d['data_desligamento'])) ?></dd></div>
-                            <div><dt>Motivo</dt><dd><?= e($d['motivo']) ?></dd></div>
-                            <div><dt>Empresa</dt><dd><?= e($d['empresa'] ?: '—') ?></dd></div>
-                            <div><dt>Registrado por</dt><dd><?= e($d['registrou'] ?: '—') ?></dd></div>
-                        </dl>
+                    <dl class="info">
+                        <div>
+                            <dt>Data do desligamento</dt>
+                            <dd>
+                                <?= date('d/m/Y', strtotime($d['data_desligamento'])) ?>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Motivo</dt>
+                            <dd>
+                                <?= e($d['motivo']) ?>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Empresa</dt>
+                            <dd>
+                                <?= e($d['empresa'] ?: '—') ?>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Registrado por</dt>
+                            <dd>
+                                <?= e($d['registrou'] ?: '—') ?>
+                            </dd>
+                        </div>
+                    </dl>
 
-                    </details>
+                </details>
 
                 <?php endforeach; ?>
 
-                <p class="vazio" id="vazio" <?= $desligamentos ? 'hidden' : '' ?>>Nenhum desligamento encontrado.</p>
+                <p class="vazio" id="vazio" <?=$desligamentos ? 'hidden' : '' ?>>Nenhum desligamento encontrado.</p>
 
             </div>
 
@@ -195,38 +236,55 @@ $aviso = $mensagens[$_GET['msg'] ?? ''] ?? null;
 
     </div>
 
-    <dialog class="modal" id="dialog">
+    <dialog class="modal" id="dialog" aria-labelledby="tituloDesligamento">
 
-        <form method="post">
+        <div class="topModal">
+            <h3 id="tituloDesligamento">Registrar desligamento</h3>
+        </div>
 
-            <div class="topModal">
-                <h3>Registrar desligamento</h3>
-            </div>
+        <div class="mainModal">
+            <form method="post" id="formDesligamento">
 
-            <label for="colaborador">Colaborador</label>
-            <select name="colaborador" id="colaborador" required>
-                <option value="">Selecione</option>
-                <?php foreach ($ativos as $c): ?>
-                    <option value="<?= (int)$c['id_colaboradores'] ?>"><?= e($c['nome_user']) ?></option>
-                <?php endforeach; ?>
-            </select>
+                <div class="ipt">
+                    <div class="separation2">
+                        <label for="colaborador">Colaborador</label>
+                        <select name="colaborador" id="colaborador" required>
+                            <option value="">Selecione um colaborador</option>
+                            <?php foreach ($ativos as $c): ?>
+                            <option value="<?= (int)$c['id_colaboradores'] ?>">
+                                <?= e($c['nome_user']) ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
 
-            <label for="data">Data do desligamento</label>
-            <input type="date" name="data" id="data" value="<?= date('Y-m-d') ?>" required>
+                <div class="ipt">
+                    <div class="separation2">
+                        <label for="data">Data do desligamento</label>
+                        <input type="date" name="data" id="data" value="<?= date('Y-m-d') ?>" required>
+                    </div>
+                </div>
 
-            <label for="motivo">Motivo</label>
-            <textarea name="motivo" id="motivo" maxlength="250" required></textarea>
+                <div class="ipt">
+                    <div class="separation2">
+                        <label for="motivo">Motivo</label>
+                        <textarea name="motivo" id="motivo" rows="3" maxlength="250" required></textarea>
+                    </div>
+                </div>
 
-            <div class="btns">
-                <button type="button" id="cancelar">Cancelar</button>
-                <button type="submit">Registrar</button>
-            </div>
+                <div class="btns">
+                    <button type="submit">Registrar</button>
+                    <button type="button" id="cancelar">Cancelar</button>
+                </div>
 
-        </form>
+            </form>
+        </div>
 
     </dialog>
 
     <script src="../assets/js/desligamentos.js"></script>
 
 </body>
+
 </html>
