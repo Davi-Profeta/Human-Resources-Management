@@ -75,6 +75,10 @@ function obterColaboradores(resposta) {
   if (Array.isArray(resposta?.dados)) return resposta.dados;
   if (Array.isArray(resposta?.data)) return resposta.data;
   if (Array.isArray(resposta?.colaboradores)) return resposta.colaboradores;
+  if (Array.isArray(resposta?.colaboradoresPorEmpresa))
+    return resposta.colaboradoresPorEmpresa;
+  if (Array.isArray(resposta?.colaboradores_por_empresa))
+    return resposta.colaboradores_por_empresa;
   return [];
 }
 
@@ -84,13 +88,26 @@ function somarGastos(resposta) {
       // Pela resposta mostrada no console: índice 2 = salário e índice 3 = benefício.
       totais.salarios += obterValorDaLinha(
         colaborador,
-        ["salario", "salario_base", "salario_mensal", "custo_salario", "custo_total_colaborador"],
+        [
+          "salario",
+          "salario_base",
+          "salario_mensal",
+          "custo_salario",
+          "custo_total_colaborador",
+        ],
         2
       );
 
       totais.beneficios += obterValorDaLinha(
         colaborador,
-        ["beneficio", "beneficios", "valor_beneficios", "total_beneficios", "custo_beneficios"],
+        [
+          "beneficio",
+          "beneficios",
+          "valor_beneficios",
+          "total_beneficios",
+          "total_beneficios_colaborador",
+          "custo_beneficios",
+        ],
         3
       );
 
@@ -192,6 +209,36 @@ function criarGraficoGastos(totais) {
         },
       ],
     },
+    plugins: [
+      {
+        id: "totalGeralAbaixoDaLegenda",
+        afterDraw: function (grafico) {
+          const legenda = grafico.legend;
+          if (!legenda) return;
+
+          const valores = grafico.data.datasets[0].data;
+          const total = valores.reduce(
+            (soma, valor) => soma + Number(valor || 0),
+            0
+          );
+          const contexto = grafico.ctx;
+          const x = legenda.left;
+          const y = legenda.top + legenda.height + 24;
+
+          contexto.save();
+          contexto.textAlign = "left";
+          contexto.textBaseline = "middle";
+          contexto.fillStyle = "#94a3b8";
+          contexto.font = `600 12px ${Chart.defaults.font.family}`;
+          contexto.fillText("Total geral", x, y);
+
+          contexto.fillStyle = "#f8fafc";
+          contexto.font = `600 14px ${Chart.defaults.font.family}`;
+          contexto.fillText(formatarReal(total), x, y + 22);
+          contexto.restore();
+        },
+      },
+    ],
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -212,7 +259,8 @@ function criarGraficoGastos(totais) {
               const valores = contexto.dataset.data;
               const total = valores.reduce((soma, valor) => soma + valor, 0);
               const valor = contexto.parsed;
-              const percentual = total > 0 ? ((valor / total) * 100).toFixed(1) : "0,0";
+              const percentual =
+                total > 0 ? ((valor / total) * 100).toFixed(1) : "0,0";
 
               return `${contexto.label}: ${formatarReal(valor)} (${percentual}%)`;
             },
@@ -225,35 +273,208 @@ function criarGraficoGastos(totais) {
         }
       },
       onHover: function (evento, elementos) {
-        evento.native.target.style.cursor = elementos.length > 0 ? "pointer" : "default";
+        evento.native.target.style.cursor =
+          elementos.length > 0 ? "pointer" : "default";
       },
     },
   });
 }
 
-async function carregarGastosGerais() {
+function agruparColaboradoresPorEmpresa(resposta) {
+  const nomesEmpresa = [
+    "nome_empresas",
+    "nome_empresa",
+    "empresa_nome",
+    "nome_da_empresa",
+    "empresa",
+    "razao_social",
+  ].map(normalizarNomeCampo);
+
+  const camposQuantidade = [
+    "quantidade_colaboradores",
+    "total_colaboradores",
+    "qtd_colaboradores",
+    "numero_colaboradores",
+  ].map(normalizarNomeCampo);
+
+  const totais = new Map();
+
+  obterColaboradores(resposta).forEach((colaborador) => {
+    if (!colaborador || typeof colaborador !== "object") return;
+
+    const chaveEmpresa = Object.keys(colaborador).find((chave) =>
+      nomesEmpresa.includes(normalizarNomeCampo(chave))
+    );
+
+    if (!chaveEmpresa) return;
+
+    const empresa = String(colaborador[chaveEmpresa] ?? "").trim();
+    if (!empresa) return;
+
+    const chaveQuantidade = Object.keys(colaborador).find((chave) =>
+      camposQuantidade.includes(normalizarNomeCampo(chave))
+    );
+
+    // Se a API retorna uma linha por colaborador, conta 1. Se já retorna
+    // o total agrupado, usa a quantidade informada pela própria API.
+    const quantidade = chaveQuantidade
+      ? Number(colaborador[chaveQuantidade]) || 0
+      : 1;
+
+    totais.set(empresa, (totais.get(empresa) || 0) + quantidade);
+  });
+
+  return Array.from(totais, ([empresa, quantidade]) => ({
+    empresa,
+    quantidade,
+  })).sort((a, b) => b.quantidade - a.quantidade);
+}
+
+function criarGraficoColaboradoresEmpresa(dados) {
+  const canvas = document.getElementById("graficoColaboradoresEmpresa");
+  const aviso = document.getElementById("avisoGraficoEmpresa");
+  if (!canvas) return;
+
+  if (dados.length === 0) {
+    canvas.hidden = true;
+    if (aviso) aviso.hidden = false;
+    console.warn(
+      "A API não retornou o nome da empresa. Inclua o campo nome_empresas (ou equivalente) na resposta.",
+      dados
+    );
+    return;
+  }
+
+  canvas.hidden = false;
+  if (aviso) aviso.hidden = true;
+
+  const cores = [
+    pegarCor("--cor-primaria"),
+    pegarCor("--cor-destaque"),
+    pegarCor("--cor-sucesso"),
+    pegarCor("--cor-alerta"),
+    "#8b5cf6",
+    "#ec4899",
+  ];
+
+  new Chart(canvas, {
+    type: "bar",
+    data: {
+      labels: dados.map((item) => item.empresa),
+      datasets: [
+        {
+          label: "Colaboradores",
+          data: dados.map((item) => item.quantidade),
+          backgroundColor: dados.map(
+            (_, indice) => cores[indice % cores.length]
+          ),
+          borderRadius: 6,
+          maxBarThickness: 52,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: "x",
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function (contexto) {
+              const quantidade = contexto.parsed.y;
+              return `${quantidade} ${
+                quantidade === 1 ? "colaborador" : "colaboradores"
+              }`;
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { autoSkip: false },
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            precision: 0,
+            stepSize: 1,
+          },
+        },
+      },
+    },
+  });
+}
+
+async function carregarDadosDashboard() {
   try {
     const resposta = await axios.get("../../src/APIs/dashboardApi.php");
-    const totais = somarGastos(resposta.data);
+    const dadosApi = resposta.data;
+    const colaboradores = obterColaboradores(dadosApi);
+    const totaisGastos = somarGastos(colaboradores);
+    const indicadores = dadosApi?.indicadores ?? {};
+    const custoMensal =
+      indicadores.custo_mensal_total ??
+      totaisGastos.salarios + totaisGastos.beneficios;
 
-    console.log("Total de salários:", formatarReal(totais.salarios));
-    console.log("Total de benefícios:", formatarReal(totais.beneficios));
+    const cardColaboradores = document.getElementById(
+      "kpiColaboradoresAtivos"
+    );
+    const cardEmpresas = document.getElementById("kpiEmpresasCadastradas");
+    const cardCusto = document.getElementById("kpiCustoMensal");
 
-    if (totais.salarios === 0 && totais.beneficios === 0) {
+    if (cardColaboradores) {
+      const quantidade = Number(indicadores.colaboradores_ativos);
+      cardColaboradores.textContent = Number.isFinite(quantidade)
+        ? quantidade.toLocaleString("pt-BR")
+        : "—";
+    }
+
+    if (cardEmpresas) {
+      const quantidade = Number(indicadores.empresas_cadastradas);
+      cardEmpresas.textContent = Number.isFinite(quantidade)
+        ? quantidade.toLocaleString("pt-BR")
+        : "—";
+    }
+
+    if (cardCusto) {
+      cardCusto.textContent = formatarReal(custoMensal);
+    }
+
+    console.log("Total de salários:", formatarReal(totaisGastos.salarios));
+    console.log("Total de benefícios:", formatarReal(totaisGastos.beneficios));
+
+    if (totaisGastos.salarios === 0 && totaisGastos.beneficios === 0) {
       console.warn(
         "A API retornou colaboradores, mas os índices 2 (salário) e 3 (benefícios) estão zerados ou não foram encontrados.",
-        resposta.data
+        dadosApi
       );
     }
 
-    criarGraficoGastos(totais);
+    criarGraficoGastos(totaisGastos);
+    criarGraficoColaboradoresEmpresa(
+      agruparColaboradoresPorEmpresa(colaboradores)
+    );
   } catch (erro) {
-    console.error("Erro ao carregar os gastos gerais:", erro);
+    console.error("Erro ao carregar os dados do dashboard:", erro);
+
+    const cardColaboradores = document.getElementById(
+      "kpiColaboradoresAtivos"
+    );
+    const cardEmpresas = document.getElementById("kpiEmpresasCadastradas");
+    const cardCusto = document.getElementById("kpiCustoMensal");
+
+    if (cardColaboradores) cardColaboradores.textContent = "—";
+    if (cardEmpresas) cardEmpresas.textContent = "—";
+    if (cardCusto) cardCusto.textContent = "—";
+
     criarGraficoGastos({ salarios: 0, beneficios: 0 });
+    criarGraficoColaboradoresEmpresa([]);
   }
 }
 
-carregarGastosGerais();
+carregarDadosDashboard();
 
 // ---------- Controle de Ponto e Frequência (mantido para uso posterior) ----------
 
