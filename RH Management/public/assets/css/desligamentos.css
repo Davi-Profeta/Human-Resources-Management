@@ -34,6 +34,10 @@ svg {
   flex-shrink: 0;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   background-color: var(--cor-menu);
 }
@@ -342,73 +346,125 @@ summary>svg {
 .modal {
   display: none;
   margin: auto;
-  width: 440px;
-  max-width: 92dvw;
   padding: 28px;
+  width: 700px;
+  max-width: 92dvw;
+  max-height: 92dvh;
+  overflow-y: auto;
   border: none;
   border-radius: 16px;
   background-color: var(--cor-superficie);
   color: var(--cor-texto);
+  font-family: var(--fonte-base);
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.45);
 }
 
 .modal[open] {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  animation: abrirModal 0.18s ease-out;
 }
 
 .modal::backdrop {
   background-color: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(2px);
+}
+
+@keyframes abrirModal {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal[open] { animation: none; }
 }
 
 .topModal {
-  margin-bottom: 20px;
   padding-bottom: 14px;
+  margin-bottom: 20px;
   border-bottom: solid 1px var(--cor-borda);
 }
 
 .topModal h3 {
   font-size: 1.25rem;
   font-weight: 600;
+  color: var(--cor-texto);
+}
+
+.mainModal { width: 100%; }
+
+.ipt {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.separation2 {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
 }
 
 .modal label {
-  display: block;
-  margin-bottom: 6px;
   font-size: 0.85rem;
   font-weight: 500;
+  color: var(--cor-texto);
 }
 
-.modal select,
 .modal input,
-.modal textarea {
-  display: block;
+.modal textarea,
+.modal select {
   width: 100%;
-  margin-bottom: 16px;
+  min-width: 0;
   padding: 10px 12px;
   border: solid 1.5px var(--cor-borda);
   border-radius: 8px;
   background-color: var(--cor-fundo);
   color: var(--cor-texto);
+  font-family: var(--fonte-base);
   font-size: 0.9rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .modal textarea {
-  min-height: 80px;
   resize: vertical;
+  min-height: 80px;
 }
 
-.modal select:focus,
+.modal select {
+  padding-right: 36px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
 .modal input:focus,
-.modal textarea:focus {
+.modal textarea:focus,
+.modal select:focus {
   outline: none;
   border-color: var(--cor-primaria);
   box-shadow: 0 0 0 3px var(--cor-primaria-clara);
+  background-color: var(--cor-superficie);
+}
+
+.modal select option {
+  background-color: var(--cor-superficie);
+  color: var(--cor-texto);
 }
 
 .btns {
+  width: 100%;
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  margin-top: 8px;
   padding-top: 18px;
   border-top: solid 1px var(--cor-borda);
 }
@@ -416,9 +472,11 @@ summary>svg {
 .btns button {
   padding: 9px 20px;
   border-radius: 10px;
+  font-family: var(--fonte-base);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .btns button[type="submit"] {
@@ -435,6 +493,16 @@ summary>svg {
   border: solid 1.5px var(--cor-borda);
   background-color: transparent;
   color: var(--cor-texto-suave);
+}
+
+.btns button[type="button"]:hover {
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+}
+
+.btns button:focus-visible {
+  outline: solid 2px var(--cor-destaque);
+  outline-offset: 2px;
 }
 
 /* ============================== CELULAR ============================== */
