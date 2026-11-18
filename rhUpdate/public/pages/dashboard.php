@@ -38,9 +38,6 @@
 
             </div>
 
-            <div class="top2">
-            </div>
-
         </header>
 
 
@@ -50,7 +47,7 @@
 
                 <div class="cardTopo">
                     <h3>Gastos Gerais</h3>
-                    <p>Total gasto por mês</p>
+                    <p>Distribuição entre salários e benefícios</p>
                 </div>
 
                 <div class="grafico">
@@ -77,7 +74,7 @@
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="../assets/js/dashboard.js"></script>
 
