@@ -1,89 +1,265 @@
-// ---------- Funções de apoio ----------
+// ---------- Configurações gerais ----------
 
-// Lê uma cor/variável direto do dashboard.css, assim a paleta fica num lugar só
 function pegarCor(nomeVariavel) {
   return getComputedStyle(document.documentElement)
     .getPropertyValue(nomeVariavel)
     .trim();
 }
 
-// Transforma 22750 em "R$ 22.750,00"
 function formatarReal(valor) {
-  return valor.toLocaleString("pt-BR", {
+  return Number(valor).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
   });
 }
 
-// Quem pediu "menos movimento" no sistema não vê animação
-function pegarDuracaoAnimacao() {
-  const reduzir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  return reduzir ? 0 : 600;
-}
-
-// Configurações que valem para todos os gráficos
 function configurarPadroes() {
   Chart.defaults.font.family = pegarCor("--fonte-base");
   Chart.defaults.font.size = 12;
   Chart.defaults.color = "#94a3b8";
   Chart.defaults.borderColor = "rgba(255, 255, 255, 0.08)";
-  Chart.defaults.animation.duration = pegarDuracaoAnimacao();
+  Chart.defaults.animation.duration = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches
+    ? 0
+    : 600;
 }
 
 configurarPadroes();
 
-// ---------- Gráfico 1: Gastos Gerais (barras) ----------
+// ---------- Gastos Gerais: pizza de salários e benefícios ----------
 
-function criarGraficoGastos(meses, valores) {
+function converterValor(valor) {
+  if (typeof valor === "number") {
+    return Number.isFinite(valor) ? valor : 0;
+  }
+
+  if (valor === null || valor === undefined || valor === "") return 0;
+
+  const texto = String(valor)
+    .replace(/R\$/gi, "")
+    .replace(/\s/g, "");
+
+  // Converte tanto "1621.00" quanto "1.621,00".
+  const normalizado = texto.includes(",")
+    ? texto.replace(/\./g, "").replace(",", ".")
+    : texto;
+
+  const numero = Number(normalizado);
+  return Number.isFinite(numero) ? numero : 0;
+}
+
+function normalizarNomeCampo(nome) {
+  return nome
+    .toLocaleLowerCase("pt-BR")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+function obterValorDaLinha(linha, nomesPossiveis, indiceNumerico) {
+  if (!linha || typeof linha !== "object") return 0;
+
+  const nomesNormalizados = nomesPossiveis.map(normalizarNomeCampo);
+  const chave = Object.keys(linha).find((nome) =>
+    nomesNormalizados.includes(normalizarNomeCampo(nome))
+  );
+
+  // O endpoint atual retorna mysqli_fetch_array, com as colunas também numeradas.
+  const valor = chave !== undefined ? linha[chave] : linha[String(indiceNumerico)];
+  return converterValor(valor);
+}
+
+function obterColaboradores(resposta) {
+  if (Array.isArray(resposta)) return resposta;
+  if (Array.isArray(resposta?.dados)) return resposta.dados;
+  if (Array.isArray(resposta?.data)) return resposta.data;
+  if (Array.isArray(resposta?.colaboradores)) return resposta.colaboradores;
+  return [];
+}
+
+function somarGastos(resposta) {
+  return obterColaboradores(resposta).reduce(
+    (totais, colaborador) => {
+      // Pela resposta mostrada no console: índice 2 = salário e índice 3 = benefício.
+      totais.salarios += obterValorDaLinha(
+        colaborador,
+        ["salario", "salario_base", "salario_mensal", "custo_salario", "custo_total_colaborador"],
+        2
+      );
+
+      totais.beneficios += obterValorDaLinha(
+        colaborador,
+        ["beneficio", "beneficios", "valor_beneficios", "total_beneficios", "custo_beneficios"],
+        3
+      );
+
+      return totais;
+    },
+    { salarios: 0, beneficios: 0 }
+  );
+}
+
+function normalizarTextoMenu(texto) {
+  return String(texto || "")
+    .toLocaleLowerCase("pt-BR")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function encontrarLinkDoMenu(termos) {
+  const documentos = [document];
+
+  // O dashboard pode estar dentro de um iframe, então também procura no menu da página pai.
+  try {
+    if (window.parent !== window && window.parent.document !== document) {
+      documentos.push(window.parent.document);
+    }
+  } catch (erro) {
+    // Se o iframe for de outra origem, continua procurando somente nesta página.
+  }
+
+  for (const pagina of documentos) {
+    const links = Array.from(pagina.querySelectorAll("a[href]"));
+
+    const linkEncontrado = links.find((link) => {
+      const informacoes = [
+        link.innerText,
+        link.getAttribute("aria-label"),
+        link.getAttribute("title"),
+        link.getAttribute("href"),
+      ]
+        .join(" ")
+        .toLocaleLowerCase("pt-BR");
+
+      const informacoesNormalizadas = normalizarTextoMenu(informacoes);
+      return termos.some((termo) => informacoesNormalizadas.includes(termo));
+    });
+
+    if (linkEncontrado) return linkEncontrado;
+  }
+
+  return null;
+}
+
+function abrirAbaDoGasto(indice) {
+  const rotas = [
+    {
+      termos: ["vinculo", "salario", "folha"],
+      fallback: "vinculos.php",
+    },
+    {
+      termos: ["beneficio"],
+      fallback: "beneficios.php",
+    },
+  ];
+
+  const categoria = rotas[indice];
+  if (!categoria) return;
+
+  const linkDoMenu = encontrarLinkDoMenu(categoria.termos);
+
+  if (linkDoMenu) {
+    linkDoMenu.click();
+    return;
+  }
+
+  // Caminhos padrão caso o menu não tenha links identificáveis.
+  window.location.assign(categoria.fallback);
+}
+
+function criarGraficoGastos(totais) {
   const canvas = document.getElementById("graficoGastos");
+  if (!canvas) {
+    console.error('Canvas "graficoGastos" não foi encontrado no dashboard.php.');
+    return;
+  }
 
   new Chart(canvas, {
-    type: "bar",
+    type: "pie",
     data: {
-      labels: meses,
+      labels: ["Salários", "Benefícios"],
       datasets: [
         {
-          label: "Gastos",
-          data: valores,
-          backgroundColor: pegarCor("--cor-primaria"),
-          hoverBackgroundColor: pegarCor("--cor-destaque"),
-          borderRadius: 6,
-          maxBarThickness: 44,
+          data: [totais.salarios, totais.beneficios],
+          backgroundColor: [
+            pegarCor("--cor-primaria"),
+            pegarCor("--cor-destaque"),
+          ],
+          borderColor: pegarCor("--cor-card"),
+          borderWidth: 3,
+          hoverOffset: 8,
         },
       ],
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false, // o gráfico acompanha a altura do .grafico
+      maintainAspectRatio: false,
       plugins: {
-        legend: { display: false },
+        legend: {
+          position: "right",
+          labels: {
+            usePointStyle: true,
+            padding: 18,
+          },
+          onClick: function (evento, itemLegenda) {
+            abrirAbaDoGasto(itemLegenda.index);
+          },
+        },
         tooltip: {
           callbacks: {
-            label: function (item) {
-              return formatarReal(item.parsed.y);
+            label: function (contexto) {
+              const valores = contexto.dataset.data;
+              const total = valores.reduce((soma, valor) => soma + valor, 0);
+              const valor = contexto.parsed;
+              const percentual = total > 0 ? ((valor / total) * 100).toFixed(1) : "0,0";
+
+              return `${contexto.label}: ${formatarReal(valor)} (${percentual}%)`;
             },
           },
         },
       },
-      scales: {
-        x: { grid: { display: false } },
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function (valor) {
-              return "R$ " + valor / 1000 + " mil";
-            },
-          },
-        },
+      onClick: function (evento, elementos) {
+        if (elementos.length > 0) {
+          abrirAbaDoGasto(elementos[0].index);
+        }
+      },
+      onHover: function (evento, elementos) {
+        evento.native.target.style.cursor = elementos.length > 0 ? "pointer" : "default";
       },
     },
   });
 }
 
-// ---------- Gráfico 2: Controle de Ponto e Frequência (rosca) ----------
+async function carregarGastosGerais() {
+  try {
+    const resposta = await axios.get("../../src/APIs/dashboardApi.php");
+    const totais = somarGastos(resposta.data);
+
+    console.log("Total de salários:", formatarReal(totais.salarios));
+    console.log("Total de benefícios:", formatarReal(totais.beneficios));
+
+    if (totais.salarios === 0 && totais.beneficios === 0) {
+      console.warn(
+        "A API retornou colaboradores, mas os índices 2 (salário) e 3 (benefícios) estão zerados ou não foram encontrados.",
+        resposta.data
+      );
+    }
+
+    criarGraficoGastos(totais);
+  } catch (erro) {
+    console.error("Erro ao carregar os gastos gerais:", erro);
+    criarGraficoGastos({ salarios: 0, beneficios: 0 });
+  }
+}
+
+carregarGastosGerais();
+
+// ---------- Controle de Ponto e Frequência (mantido para uso posterior) ----------
 
 function criarGraficoPonto(situacao) {
   const canvas = document.getElementById("graficoPonto");
+  if (!canvas) return;
 
   new Chart(canvas, {
     type: "doughnut",
@@ -115,35 +291,3 @@ function criarGraficoPonto(situacao) {
     },
   });
 }
-
-/* ========================== Valores dashboard =================== */
-async function carregarValoresDashboard() {
-
-    try {
-        const { data } = await axios.get("../../src/APIs/dashboardApi.php"); 
-
-        let custoColaborador = 0;
-        let totalGeral = 0;
-
-        data.forEach(element => {
-
-            Object.entries(element).forEach(([chave, valor]) => {
-
-                console.log(`${chave}: ${valor}`);
-
-            });
-
-            //console.log(element);
-            //custoColaborador += Number(element.custo_total_colaborador);
-
-        });
-
-        console.log("Total Geral:", totalGeral);
-
-    } catch (error) {
-        console.error("Erro na requisição:", error);
-    }
-
-};
-
-carregarValoresDashboard();
