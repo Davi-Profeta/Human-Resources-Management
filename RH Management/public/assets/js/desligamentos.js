@@ -4,8 +4,16 @@ const vazio  = document.getElementById('vazio');
 const itens  = document.querySelectorAll('.desligamento');
 
 // abrir e fechar o modal
-document.getElementById('novo').onclick = () => dialog.showModal();
+document.getElementById('novo').onclick = () => {
+    document.getElementById('formDesligamento').reset();
+    dialog.showModal();
+};
 document.getElementById('cancelar').onclick = () => dialog.close();
+
+// mesmo comportamento do modal de benefícios: clique fora fecha
+dialog.addEventListener('click', event => {
+    if (event.target === dialog) dialog.close();
+});
 
 // pesquisa: esconde o que não combina com o texto digitado
 busca.oninput = () => {
