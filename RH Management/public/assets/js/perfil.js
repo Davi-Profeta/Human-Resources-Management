@@ -53,3 +53,21 @@ if (perfil) {
     });
 
 }
+
+/* ======================= TELA DE SAÍDA ======================= */
+const linkSair = document.querySelector(".perfil-item.sair");
+
+linkSair.addEventListener("click", (e) => {
+    e.preventDefault();                       // segura a navegação
+
+    // cria a tela de carregamento por cima de tudo (inclusive do iframe)
+    const tela = document.createElement("div");
+    tela.className = "saindo";
+    tela.setAttribute("role", "status");
+    tela.innerHTML = '<span class="spinner"></span><p>Saindo...</p>';
+    document.body.appendChild(tela);
+
+    setTimeout(() => {
+        window.location.href = linkSair.href; // vai para o logout.php
+    }, 1500);                                  // 1500 = 1,5 s
+});
