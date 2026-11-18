@@ -1,59 +1,36 @@
 /*==================== BUSCA + FILTRO DE STATUS ===============================*/
-const table = document.querySelector("#tabela");
 const input = document.querySelector("#ipt");
 const select = document.querySelector("#filtroStatus");
-const linhas = document.querySelectorAll(".tbody tr");
+const cartoes = document.querySelectorAll(".card-empresa");
+const vazio = document.querySelector("#vazio");
 
-let nomesEncontrados = null; 
-
-const normalizar = texto => texto.trim().toLowerCase();
-
-// Decide quais linhas aparecem, considerando busca E status
+// mostra só os cartões que combinam com o texto digitado E com o status escolhido
 function aplicarFiltros() {
 
-    const statusSelecionado = select.value;
+    const texto = input.value.trim().toLowerCase();
+    const status = select.value;
+    let visiveis = 0;
 
-    linhas.forEach(linha => {
+    cartoes.forEach(cartao => {
 
-        const nome = normalizar(linha.cells[0].textContent);
-        const statusLinha = linha.querySelector(".statsNow")?.textContent.trim();
+        const bateTexto = cartao.dataset.busca.includes(texto);
+        const bateStatus = status === "" || cartao.dataset.statusNome === status;
+        const mostrar = bateTexto && bateStatus;
 
-        const passaBusca = nomesEncontrados === null || nomesEncontrados.has(nome);
-        const passaStatus = statusSelecionado === "" || statusLinha === statusSelecionado;
-
-        linha.style.display = (passaBusca && passaStatus) ? "" : "none";
+        cartao.hidden = !mostrar;
+        if (mostrar) visiveis++;
 
     });
 
+    // só mostra "nenhuma encontrada" quando existem empresas mas o filtro escondeu todas
+    if (cartoes.length > 0) {
+        vazio.hidden = visiveis > 0;
+        vazio.textContent = "Nenhuma empresa encontrada para esse filtro.";
+    }
+
 }
 
-input.addEventListener("input", _.throttle(async e => {
-
-    const digitado = e.target.value.trim();
-
-    // campo vazio: remove a busca e mostra tudo (respeitando o status)
-    if (digitado === "") {
-        nomesEncontrados = null;
-        aplicarFiltros();
-        return;
-    }
-
-    try {
-
-        const { data } = await axios.get("../../src/APIs/buscarEmpresas.php", {
-            params: { empresa: digitado }
-        });
-
-        // guarda os nomes que a API devolveu
-        nomesEncontrados = new Set(data.map(emp => normalizar(emp.nome_empresas)));
-        aplicarFiltros();
-
-    } catch (error) {
-        console.log(error);
-    }
-
-}, 300));
-
+input.addEventListener("input", aplicarFiltros);
 select.addEventListener("change", aplicarFiltros);
 
 
@@ -75,21 +52,55 @@ cancel.addEventListener("click", () => {
 });
 
 
+/*==================== DETALHES DA EMPRESA ===============================*/
+const modalDetalhes = document.querySelector(".detalhes");
+const btnDetFechar = document.querySelector("#detFechar");
+const btnDetApagar = document.querySelector("#detApagar");
+
+let idDetalhe = null; // empresa que está aberta no modal de detalhes
+
+document.querySelectorAll(".btn-detalhes").forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+        const c = btn.closest(".card-empresa").dataset;
+
+        idDetalhe = c.id;
+
+        document.querySelector("#detNome").textContent = c.nome;
+        document.querySelector("#detCnpj").textContent = c.cnpjFmt;
+        document.querySelector("#detStatus").textContent = c.statusNome;
+        document.querySelector("#detEmail").textContent = c.email;
+        document.querySelector("#detTel").textContent = c.tel;
+        document.querySelector("#detLocal").textContent = c.local;
+        document.querySelector("#detRS").textContent = c.rs || "—";
+        document.querySelector("#detQtd").textContent = c.qtd;
+
+        modalDetalhes.showModal();
+
+    });
+
+});
+
+btnDetFechar.addEventListener("click", () => modalDetalhes.close());
+
+// clicar fora da caixa (no fundo escuro) também fecha
+modalDetalhes.addEventListener("click", e => {
+    if (e.target === modalDetalhes) modalDetalhes.close();
+});
+
+
 /* ============================ APAGAR EMPRESA =========================*/
+// o botão "Apagar empresa" fica dentro dos detalhes e abre a confirmação
 const modalDelete = document.querySelector(".delete");
 const iptDelete = document.querySelector("#idApagar");
 const closeModal = document.querySelector("#cancelarExcluir");
 
-table.addEventListener("click", e => {
+btnDetApagar.addEventListener("click", () => {
 
-    const btn = e.target.closest(".btn-excluir");
-
-    if (btn) {
-
-        modalDelete.showModal();
-        iptDelete.value = btn.dataset.id;
-
-    };
+    iptDelete.value = idDetalhe;
+    modalDetalhes.close();
+    modalDelete.showModal();
 
 });
 
@@ -101,37 +112,31 @@ closeModal.addEventListener("click", () => {
 
 /* ========================== EDITAR DADOS ===========================*/
 const edit = document.querySelector(".edit");
-const btnEditar = document.querySelectorAll(".btn-editar");
+const formEdit = edit.querySelector("form");
 const cancelEdit = document.querySelector("#cancelEdit");
 const idEditar = document.querySelector("#idEditar");
 
-btnEditar.forEach(btn => {
+document.querySelectorAll(".btn-editar").forEach(btn => {
 
-    btn.addEventListener("click", e => {
+    btn.addEventListener("click", () => {
 
-        const btnClicado = e.currentTarget;
-        const cima = btnClicado.closest("tr");
-        const inpt = edit.getElementsByTagName("input");
+        const c = btn.closest(".card-empresa").dataset;
 
-        idEditar.value = btnClicado.dataset.id; // id vai para o input hidden
+        idEditar.value = c.id; // id vai para o input hidden
 
-        values(cima, inpt);
+        formEdit.elements["name"].value = c.nome;
+        formEdit.elements["cnpj"].value = c.cnpj;
+        formEdit.elements["email"].value = c.email;
+        formEdit.elements["tel"].value = c.tel;
+        formEdit.elements["local"].value = c.local;
+        formEdit.elements["RS"].value = c.rs;
+        formEdit.elements["status"].value = c.status; // agora o status atual já vem marcado
+
         edit.showModal();
 
     });
 
 });
-
-function values(tr, inpt) {
-
-    inpt.name.value = tr.children[0].textContent;
-    inpt.cnpj.value = tr.children[1].textContent;
-    inpt.email.value = tr.children[2].textContent;
-    inpt.tel.value = tr.children[3].textContent;
-    inpt.local.value = tr.children[4].textContent;
-    inpt.RS.value = tr.children[5].textContent;
-
-};
 
 cancelEdit.addEventListener("click", () => {
 
@@ -143,24 +148,33 @@ cancelEdit.addEventListener("click", () => {
 const profile = document.querySelector(".profile");
 const dialogUser = document.querySelector("dialog.user");
 
-profile.addEventListener("click", async e => {
+profile.addEventListener("click", async () => {
 
     try {
-        const res = await axios.get("../../src/APIs/loginUser.php");
-        dialogUser.innerHTML = res.data;
+
+        const resposta = await fetch("../../src/APIs/loginUser.php");
+
+        if (!resposta.ok) {
+            throw new Error("Erro ao carregar perfil");
+        }
+
+        dialogUser.innerHTML = await resposta.text();
         dialogUser.showModal();
 
-    } catch (error) {
+    } catch (erro) {
         console.log("Erro ao buscar login");
     };
 
 });
 
 dialogUser.addEventListener("click", e => {
-    if (e.target === dialogUser || e.target.id === "closeUser") {
+
+    if (e.target === dialogUser || e.target.closest("#closeUser")) {
         dialogUser.close();
     }
-    if (e.target.id === "logout") {
-        window.location.href = ""; // seu logout
+
+    if (e.target.closest("#logout")) {
+        window.top.location.href = new URL("logout.php", window.top.location.href).href;
     }
+
 });
