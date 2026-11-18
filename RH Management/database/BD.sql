@@ -221,6 +221,13 @@ FROM (
 WHERE NOT EXISTS (SELECT 1 FROM tipo_vinculo);
 
 -- ==========================================
+-- INSERÇÃO DO LOGIN PRINCIPAL
+-- ==========================================
+
+INSERT INTO acessos (nome_user, CPF, email, telefone, endereco, senha, nivel)
+VALUES ('ADM', 000000000000, 'admaster@gmail.com', 31999999999, 'Rua ctti - 477', 1234, 1)
+
+-- ==========================================
 -- INSERÇÃO DOS BENEFÍCIOS INICIAIS
 -- ==========================================
 
