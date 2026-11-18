@@ -1,7 +1,11 @@
-*{
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
+@view-transition {
+  navigation: auto;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 :root {
@@ -30,19 +34,23 @@ svg {
   flex-shrink: 0;
 }
 
+body {
+  background-color: var(--cor-menu);
+}
+
 /* a página não rola: só a lista rola por dentro */
 .container {
   width: 100%;
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  padding: 0 24px 24px;
+  padding: 0 20px 24px;
   background-color: var(--cor-menu);
   color: var(--cor-fundo);
   font-family: var(--fonte-base);
 }
 
-.container > header,
+.container>header,
 .resumo,
 #ipt,
 .aviso {
@@ -55,7 +63,8 @@ header {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px 0;
+  min-height: 15dvh;
+  padding: 12px 0;
 }
 
 .titulo {
@@ -290,14 +299,14 @@ main {
   color: #fda4af;
 }
 
-summary > svg {
+summary>svg {
   width: 18px;
   height: 18px;
   opacity: 0.7;
   transition: transform 0.2s;
 }
 
-.desligamento[open] summary > svg {
+.desligamento[open] summary>svg {
   transform: rotate(180deg);
 }
 
@@ -430,10 +439,6 @@ summary > svg {
 
 /* ============================== CELULAR ============================== */
 @media (max-width: 600px) {
-
-  .container {
-    padding: 0 16px 16px;
-  }
 
   .resumo {
     grid-template-columns: 1fr;
