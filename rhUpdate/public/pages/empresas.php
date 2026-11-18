@@ -456,15 +456,14 @@ function formatarCnpj($cnpj)
 
             <input type="hidden" name="acao" value="apagar">
             <input type="hidden" name="id" id="idApagar">
+
+            <div class="btns">
+                <button type="submit" class="excluir">Apagar</button>
+                <button type="button" id="cancelarExcluir">Cancelar</button>
+            </div>
         </form>
 
     </dialog>
-
-    <dialog class="user">
-
-
-    </dialog>
-
 </body>
 <script src="../assets/js/empresas.js"></script>
 
