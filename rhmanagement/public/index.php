@@ -73,7 +73,19 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     <main>
 
         <!-- Área reservada para o futuro carrossel de imagens da empresa. -->
-        <aside class="carrossel" aria-hidden="true"></aside>
+        <aside class="carrossel" aria-labelledby="titulo-carrossel">
+            <div class="fotos" id="fotos" aria-hidden="true"></div>
+            <div class="carrossel-conteudo">
+                <span class="carrossel-tag">PERSONALIZE SEU ESPAÇO</span>
+                <h2 id="titulo-carrossel">O site pode ter sua cara</h2>
+                <p>Adicione até 3 fotos que representem sua empresa.</p>
+                <label class="escolher-fotos" for="fotosInput">+ Escolher fotos</label>
+                <input type="file" id="fotosInput" accept="image/png,image/jpeg,image/webp" multiple>
+                <button type="button" id="limparFotos" hidden>Remover fotos</button>
+                <p id="statusFotos" role="status" aria-live="polite"></p>
+                <div id="indicadores" aria-label="Selecionar foto"></div>
+            </div>
+        </aside>
 
         <section class="login" aria-labelledby="titulo-login">
 
@@ -195,6 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 
         window.addEventListener("pageshow", () => tela.hidden = true);
 </script>
+    <script src="assets/js/carrossel.js" defer></script>
 </body>
 
 </html>
