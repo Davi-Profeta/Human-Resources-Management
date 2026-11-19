@@ -31,8 +31,7 @@
   transition: background-color 0.3s ease;
 }
 
-section:hover .perfil-btn,
-section.menu-aberto .perfil-btn {
+.perfil-btn:hover {
   background-color: rgba(246, 248, 251, 0.06);
 }
 
