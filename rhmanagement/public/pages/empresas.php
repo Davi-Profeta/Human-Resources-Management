@@ -1,6 +1,7 @@
 <?php
 
 require_once "../../src/config/conexao.php";
+require_once "../../src/config/gravarHistorico.php";
 session_start();
 
 if (empty($_SESSION['User']) || $_SESSION['Nivel'] != 1) {
@@ -25,13 +26,24 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         $Enterprice = $pdo->prepare("INSERT INTO empresas(nome_empresas, CNPJ, email, telefone, endereco, razao_social, id_stats)
             VALUES (?, ?, ?, ?, ?, ?, ?)");
         $Enterprice->execute([$nameEnterprice, $CNPJ, $Email, $Tel, $Endereco, $Razao, $Stats]);
+
+        gravarHistorico($pdo, $pdo->lastInsertId(), 'empresas', 'cadastro', '', $nameEnterprice);
     } else if ($Acao === 'apagar') {
 
         $Id = $_POST['id'];
 
+        $nome = $pdo->prepare("SELECT nome_empresas FROM empresas WHERE id_empresas = ?");
+        $nome->execute([$Id]);
+        $nome = $nome->fetchColumn();
+
+        // o histórico guarda o id da empresa; solta o vínculo para a empresa poder ser apagada
+        $pdo->prepare("UPDATE historico_alteracoes SET id_empresa = NULL WHERE id_empresa = ?")->execute([$Id]);
+
         $deleteEnterprice = $pdo->prepare("DELETE FROM empresas
             WHERE id_empresas = ?");
         $deleteEnterprice->execute([$Id]);
+
+        gravarHistorico($pdo, $Id, 'empresas', 'exclusao', $nome, '');
     } else if ($Acao === "edit") {
 
         $nameEnterprice = $_POST['name'];
@@ -44,10 +56,26 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 
         $Id = $_POST['id'];
 
+        $antes = $pdo->prepare("SELECT nome_empresas, CNPJ, email, telefone, endereco, razao_social, id_stats FROM empresas WHERE id_empresas = ?");
+        $antes->execute([$Id]);
+        $antes = $antes->fetch(PDO::FETCH_ASSOC);
+
         $Enterprice = $pdo->prepare("UPDATE empresas
             SET nome_empresas = ?, CNPJ = ?, email = ?, telefone = ?, endereco = ?, razao_social = ?, id_stats = ?
             WHERE id_empresas = ?");
         $Enterprice->execute([$nameEnterprice, $CNPJ, $Email, $Tel, $Endereco, $Razao, $Stats, $Id]);
+
+        // grava só o que mudou
+        $nomesStatus = $pdo->query("SELECT id_status, status_agora FROM statuss")->fetchAll(PDO::FETCH_KEY_PAIR);
+        $depois = ['nome_empresas' => $nameEnterprice, 'CNPJ' => $CNPJ, 'email' => $Email, 'telefone' => $Tel,
+            'endereco' => $Endereco, 'razao_social' => $Razao, 'id_stats' => $Stats];
+
+        foreach ($depois as $campo => $novo) {
+            if ((string)$antes[$campo] !== (string)$novo) {
+                $v = fn($x) => $campo === 'id_stats' ? ($nomesStatus[$x] ?? $x) : $x;
+                gravarHistorico($pdo, $Id, 'empresas', $campo, $v($antes[$campo]), $v($novo));
+            }
+        }
     };
 };
 
