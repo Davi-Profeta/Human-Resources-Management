@@ -28,6 +28,8 @@ $tabelas = [
     'colaborador_beneficio' => 'Benefício',
     'vinculo_trabalista'    => 'Vínculo',
     'colaboradores'         => 'Colaborador',
+    'empresas'              => 'Empresa',
+    'acessos'               => 'Usuário',
 ];
 
 $campos = [
@@ -48,6 +50,11 @@ $campos = [
     'tipo' => 'Tipo',
     'valor' => 'Valor',
     'desconto' => 'Desconto',
+    'nome_empresas' => 'Nome',
+    'CNPJ' => 'CNPJ',
+    'endereco' => 'Endereço',
+    'razao_social' => 'Razão social',
+    'id_stats' => 'Status',
 ];
 
 // tipo da ação => [nome, ícone]
@@ -64,6 +71,8 @@ $registros = $pdo->query("SELECT h.*, a.nome_user AS usuario,
             WHEN 'beneficios' THEN (SELECT nome_beneficios FROM beneficios WHERE id_beneficios = h.id_registro)
             WHEN 'vinculo_trabalista' THEN (SELECT nome_user FROM colaboradores WHERE id_trabalista = h.id_registro LIMIT 1)
             WHEN 'colaboradores' THEN (SELECT nome_user FROM colaboradores WHERE id_colaboradores = h.id_registro)
+            WHEN 'empresas' THEN (SELECT nome_empresas FROM empresas WHERE id_empresas = h.id_registro)
+            WHEN 'acessos' THEN (SELECT nome_user FROM acessos WHERE id_acesso = h.id_registro)
         END AS alvo
     FROM historico_alteracoes h
     LEFT JOIN acessos a ON a.id_acesso = h.id_acessos
