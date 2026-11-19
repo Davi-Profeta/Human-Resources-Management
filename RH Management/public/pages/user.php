@@ -141,12 +141,12 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
                                 <td>{$endereco}</td>
                                 <td>
                                     <div class=\"acoes\">
-                                        <a class='btn-acao btn-editar' href='user.php?editar={$resultado['id_acesso']}' title='Editar usuário'>
+                                        <button type='button' class='btn-acao btn-editar' data-id='{$resultado['id_acesso']}' data-nivel='" . (int)$resultado['nivel'] . "' title='Editar usuário'>
                                             <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">
                                                 <path d=\"M12 20h9\" />
                                                 <path d=\"M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z\" />
                                             </svg>
-                                        </a>
+                                        </button>
                                         <button type='button' class='btn-acao btn-excluir'
                                                 data-id='{$resultado['id_acesso']}'
                                                 title='Apagar usuário' aria-label='Apagar usuário'>
@@ -272,18 +272,109 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 
             <input type="hidden" name="id" id="idExcluir">
             <input type="hidden" name="acao" value="apagar">
+            <div class="dialog-botoes">
+                <button type="button" id="cancelarExcluir">Cancelar</button>
+                <button type="submit" class="excluir">Apagar</button>
+            </div>
         </form>
 
     </dialog>
 
     <dialog class="user">
 
+        <div class="topModal">
+            <h3>Editar Dados</h3>
+        </div>
+
+        <div class="mainModal">
+
+            <form action="user.php" method="post">
+
+                <div class="ipt">
+
+                    <div class="separation">
+                        <label for="">Nome Completo</label>
+                        <input required type="text" name="name" id="">
+                    </div>
+
+                    <div class="separation">
+                        <label for="">CPF</label>
+                        <input required maxlength="11" type="text" name="CPF" id="">
+                    </div>
+
+                </div>
+
+                <div class="ipt">
+
+                    <div class="separation">
+                        <label for="">Email</label>
+                        <input required type="text" name="email" id="">
+                    </div>
+
+                    <div class="separation">
+                        <label for="">Telefone</label>
+                        <input required maxlength="13" type="tel" name="tel" id="">
+                    </div>
+
+                </div>
+
+                <div class="ipt">
+
+                    <div class="separation">
+                        <label for="">Endereço</label>
+                        <input required type="text" name="local" id="">
+                    </div>
+
+                    <div class="separation">
+                        <label for="">Nivel de Usuário</label>
+                        <select required name="nivel">
+                            <option value="">Selecione o nível</option>
+                            <option value="1"> Administrador </option>
+                            <option value="2"> Gerente RH </option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="ipt">
+
+                    <div class="separation">
+                        <label for="">Senha (opcional)</label>
+                        <input type="password" name="password1" id="">
+                    </div>
+
+                    <div class="separation">
+                        <label for="">Confirmar Senha (opcional)</label>
+                        <input type="password" name="password2" id="">
+                    </div>
+
+                </div>
+
+                <div class="ipt">
+
+                    <p class='erro' id="erroEditar"> </p>
+
+                    <div class="btns">
+                        <button type="submit">Confirmar</button>
+                        <button type="button" id="cancelarEditar">Cancelar</button>
+                    </div>
+
+                </div>
+
+                <!-- input para ação no PHP -->
+                <input type="hidden" name="acao" value="editar">
+                <input type="hidden" name="id" id="idEditar">
+
+            </form>
+
+        </div>
 
     </dialog>
 
 </body>
-<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="../assets/js/user.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="../assets/js/user.js"></script>
 
 </html>
