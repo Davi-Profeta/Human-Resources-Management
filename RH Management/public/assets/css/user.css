@@ -285,7 +285,7 @@ tr:hover td {
 }
 
 /* ================================ DIALOGS ================================*/
-.createUser {
+:is(:is(.createUser, .user), dialog.user) {
   display: none;
   margin: auto;
   padding: 28px;
@@ -300,13 +300,13 @@ tr:hover td {
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.45);
 }
 
-.createUser[open] {
+:is(:is(.createUser, .user), dialog.user)[open] {
   display: flex;
   flex-direction: column;
   animation: abrirModal 0.18s ease-out;
 }
 
-.createUser::backdrop {
+:is(:is(.createUser, .user), dialog.user)::backdrop {
   background-color: rgba(15, 23, 42, 0.7);
   backdrop-filter: blur(2px);
 }
@@ -323,7 +323,7 @@ tr:hover td {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .createUser[open] {
+  :is(:is(.createUser, .user), dialog.user)[open] {
     animation: none;
   }
 }
@@ -368,13 +368,13 @@ tr:hover td {
   width: 50%;
 }
 
-.createUser label {
+:is(:is(.createUser, .user), dialog.user) label {
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--cor-texto);
 }
 
-.createUser input {
+:is(:is(.createUser, .user), dialog.user) input {
   width: 100%;
   padding: 10px 12px;
   border: solid 1.5px var(--cor-borda);
@@ -388,7 +388,7 @@ tr:hover td {
     box-shadow 0.2s;
 }
 
-.createUser input:focus {
+:is(:is(.createUser, .user), dialog.user) input:focus {
   outline: none;
   border-color: var(--cor-primaria);
   box-shadow: 0 0 0 3px var(--cor-primaria-clara);
@@ -452,7 +452,7 @@ tr:hover td {
   font-weight: 500;
 }
 
-.createUser select {
+:is(:is(.createUser, .user), dialog.user) select {
   width: 100%;
   padding: 10px 36px 10px 12px;
   border: solid 1.5px var(--cor-borda);
@@ -473,14 +473,14 @@ tr:hover td {
     box-shadow 0.2s;
 }
 
-.createUser select:focus {
+:is(:is(.createUser, .user), dialog.user) select:focus {
   outline: none;
   border-color: var(--cor-primaria);
   box-shadow: 0 0 0 3px var(--cor-primaria-clara);
   background-color: var(--cor-superficie);
 }
 
-.createUser select option {
+:is(:is(.createUser, .user), dialog.user) select option {
   background-color: var(--cor-superficie);
   color: var(--cor-texto);
 }
