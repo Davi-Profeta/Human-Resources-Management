@@ -1,6 +1,7 @@
 <?php
 
 require_once "../../src/config/conexao.php";
+require_once "../../src/config/gravarHistorico.php";
 session_start();
 
 if (empty($_SESSION['User']) || $_SESSION['Nivel'] != 1) {
@@ -30,6 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 
         $stmt = $pdo->prepare($add);
         $stmt->execute([$Name, $CPF, $Email, $Tel, $Local, $Pass1, $Nivel]);
+
+        gravarHistorico($pdo, $pdo->lastInsertId(), 'acessos', 'cadastro', '', $Name);
     };
 
     if ($Acao === "apagar") {
@@ -39,8 +42,18 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         $deletar = ("DELETE FROM acessos
             WHERE id_acesso = ?");
 
+        $nome = $pdo->prepare("SELECT nome_user FROM acessos WHERE id_acesso = ?");
+        $nome->execute([$Id]);
+        $nome = $nome->fetchColumn();
+
+        // solta o usuário do histórico e dos desligamentos para ele poder ser apagado
+        $pdo->prepare("UPDATE historico_alteracoes SET id_acessos = NULL WHERE id_acessos = ?")->execute([$Id]);
+        $pdo->prepare("UPDATE desligamento SET id_acessos = NULL WHERE id_acessos = ?")->execute([$Id]);
+
         $stmtA = $pdo->prepare($deletar);
         $stmtA->execute([$Id]);
+
+        gravarHistorico($pdo, $Id, 'acessos', 'exclusao', $nome, '');
     };
 };
 
