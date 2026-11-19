@@ -317,3 +317,28 @@ h1 {
         margin-bottom: 32px;
     }
 }
+
+/* Carrossel personalizado */
+.carrossel { position: relative; isolation: isolate; display: flex; align-items: flex-end; overflow: hidden; min-height: 100dvh; background: linear-gradient(145deg,#233e80,#101725 75%); color: #fff; color-scheme: dark; }
+.fotos, .fotos img, .carrossel::after { position: absolute; inset: 0; width: 100%; height: 100%; }
+.fotos { z-index: -2; }
+.fotos img { object-fit: cover; opacity: 0; transition: opacity .7s ease; }
+.fotos img.ativa { opacity: 1; }
+.carrossel::after { content: ''; z-index: -1; background: linear-gradient(0deg,rgba(10,17,32,.94),rgba(10,17,32,.25) 70%); pointer-events: none; }
+.carrossel-conteudo { width: 100%; padding: clamp(28px,5vw,72px); }
+.carrossel-tag { font-size: 12px; font-weight: 700; letter-spacing: 2px; color: #b8caff; }
+.carrossel h2 { font: 800 clamp(32px,4vw,62px)/1.12 'Manrope',sans-serif; margin: 16px 0; letter-spacing: -1.5px; }
+.carrossel p { color: #d4deef; line-height: 1.6; margin-bottom: 20px; }
+.escolher-fotos, #limparFotos { display: inline-flex; align-items: center; padding: 12px 18px; border: 1px solid #ffffff66; border-radius: 8px; background: #ffffff18; color: white; cursor: pointer; }
+.escolher-fotos:hover, #limparFotos:hover { background: #ffffff30; }
+#fotosInput { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.carrossel-conteudo:has(#fotosInput:focus-visible) .escolher-fotos { outline: 2px solid white; outline-offset: 3px; }
+#limparFotos { margin-left: 8px; }
+#limparFotos[hidden] { display: none; }
+#statusFotos { font-size: 13px; margin: 12px 0; }
+#indicadores { display: flex; gap: 8px; }
+#indicadores button { width: 32px; height: 24px; background: transparent; border: 0; cursor: pointer; display: grid; align-items: center; }
+#indicadores button::after { content: ''; height: 4px; border-radius: 6px; background: #ffffff55; }
+#indicadores button[aria-current=true]::after { background: white; }
+@media(max-width:768px) { main { flex-direction: column-reverse; } .carrossel { min-height: 380px; flex: none; } .login { min-height: 100dvh; } }
+@media(prefers-reduced-motion:reduce) { .fotos img { transition: none; } }
