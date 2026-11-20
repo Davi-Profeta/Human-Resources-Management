@@ -61,7 +61,7 @@
                 <circle cx="10" cy="6.8" r=".8" fill="currentColor" />
                 <circle cx="14.3" cy="6.8" r=".8" fill="currentColor" />
             </svg>
-            Personalizar aparência
+            Personalizar
         </button>
 
         <hr>
