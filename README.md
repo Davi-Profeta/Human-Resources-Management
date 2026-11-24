@@ -6,7 +6,6 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow?style=for-the-badge)
 
 ## 📌 Sobre o projeto
 
@@ -200,13 +199,5 @@ Durante o desenvolvimento do projeto, foram aplicados conhecimentos em:
 ## 👨‍💻 Equipe de desenvolvimento
 
 Projeto desenvolvido por uma equipe de quatro integrantes como trabalho final do curso de Desenvolvimento Web — SENAI.
-
-## 📍 Status do projeto
-
-🚧 Em desenvolvimento.
-
-O projeto está em processo de implementação, integração e aprimoramento dos seus módulos.
-
----
 
 **Human Resources Management — Tecnologia aplicada à gestão estratégica de pessoas.**
